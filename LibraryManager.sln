@@ -3,7 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryManager", "LibraryManager\LibraryManager.csproj", "{6CE4F479-1CC9-4CF2-B152-08A8149A33F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseLibrary", "DatabaseLibrary\DatabaseLibrary.csproj", "{8FF2AECB-F940-413F-9E5B-E4B3D8C0F379}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErrorMessageLibrary", "ErrorMessageLibrary\ErrorMessageLibrary.csproj", "{388F62A1-BA84-49AD-921E-77FE2F579C68}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MailSendLibrary", "MailSendLibrary\MailSendLibrary.csproj", "{1FE60AB5-48A1-44DE-97A6-1354360A7D1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathLibrary", "MathLibrary\MathLibrary.csproj", "{D02B058B-6DB9-4DC3-A8D6-B0AA7DE95B0E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModbusLibrary", "ModbusLibrary\ModbusLibrary.csproj", "{27414BF9-6F09-4053-B206-8B7B111A0829}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModbusReceiveLibrary", "ModbusReceiveLibrary\ModbusReceiveLibrary.csproj", "{3F21A14F-2B91-4B15-BD46-62D80B108ED6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +21,30 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6CE4F479-1CC9-4CF2-B152-08A8149A33F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6CE4F479-1CC9-4CF2-B152-08A8149A33F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6CE4F479-1CC9-4CF2-B152-08A8149A33F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6CE4F479-1CC9-4CF2-B152-08A8149A33F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FF2AECB-F940-413F-9E5B-E4B3D8C0F379}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FF2AECB-F940-413F-9E5B-E4B3D8C0F379}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FF2AECB-F940-413F-9E5B-E4B3D8C0F379}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FF2AECB-F940-413F-9E5B-E4B3D8C0F379}.Release|Any CPU.Build.0 = Release|Any CPU
+		{388F62A1-BA84-49AD-921E-77FE2F579C68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{388F62A1-BA84-49AD-921E-77FE2F579C68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{388F62A1-BA84-49AD-921E-77FE2F579C68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{388F62A1-BA84-49AD-921E-77FE2F579C68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FE60AB5-48A1-44DE-97A6-1354360A7D1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FE60AB5-48A1-44DE-97A6-1354360A7D1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FE60AB5-48A1-44DE-97A6-1354360A7D1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FE60AB5-48A1-44DE-97A6-1354360A7D1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D02B058B-6DB9-4DC3-A8D6-B0AA7DE95B0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D02B058B-6DB9-4DC3-A8D6-B0AA7DE95B0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D02B058B-6DB9-4DC3-A8D6-B0AA7DE95B0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D02B058B-6DB9-4DC3-A8D6-B0AA7DE95B0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27414BF9-6F09-4053-B206-8B7B111A0829}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27414BF9-6F09-4053-B206-8B7B111A0829}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27414BF9-6F09-4053-B206-8B7B111A0829}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27414BF9-6F09-4053-B206-8B7B111A0829}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F21A14F-2B91-4B15-BD46-62D80B108ED6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F21A14F-2B91-4B15-BD46-62D80B108ED6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F21A14F-2B91-4B15-BD46-62D80B108ED6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F21A14F-2B91-4B15-BD46-62D80B108ED6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
