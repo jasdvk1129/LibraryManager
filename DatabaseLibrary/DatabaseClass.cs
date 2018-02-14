@@ -9,9 +9,9 @@ namespace DatabaseLibrary
     public class DatabaseClass
     {
         public ErrorMessageClass ErrMsg;
-        public string ConnStr = "";
-        public string mSQLDatabase = "";
-        public bool mErrFlag = false;
+        public string ConnStr { get; set; } = "";
+        public string mSQLDatabase { get; set; } = "";
+        public bool mErrFlag { get; set; } = false;
         private string mWorkPath;               //資料路徑
         public string WorkPath
         {
