@@ -13,14 +13,35 @@ namespace ModbusLibrary
                 return "";
         }
 
-        public byte[] FatekCmd16bits_Write(byte id, byte func,byte amount,string reg,int no,int val)
+        public bool FatekCheckSum(byte[] receive)
+        {
+            bool CheckFlag = false;
+            int ReceiveLength = receive.Length;         //長度
+            byte SumH = receive[ReceiveLength - 3];
+            byte SumL = receive[ReceiveLength - 4];
+            int SumValueLength = ReceiveLength - 3;
+            int SumValue = 0;
+            for (int i = 0; i < SumValueLength; i++)
+                SumValue += receive[i];
+            string ModSum = (SumValue % 256).ToString();
+            byte[] _modsum = Encoding.ASCII.GetBytes(Right("" + ModSum, 2));
+            if (_modsum[0] == SumH && _modsum[1] == SumL)
+                CheckFlag = true;
+            else
+                CheckFlag = false;
+            return CheckFlag;
+        }
+
+        public byte[] FatekCmd16bits_Write(byte id, byte func, byte amount, string reg, int no, int val)
         {
             byte[] _id = Encoding.ASCII.GetBytes(Right("00" + id.ToString(), 2));
             byte[] _func = Encoding.ASCII.GetBytes(Right("00" + func.ToString(), 2));
-            byte[] _amount = Encoding.ASCII.GetBytes(Right("00" + amount.ToString(), 2));
+            string HexAmount = Convert.ToString(amount, 16).ToUpper();                  //實際數量轉成16進制
+            byte[] _amount = Encoding.ASCII.GetBytes(Right("00" + HexAmount, 2));       //整理數量字串為ASCII
             byte[] _reg = Encoding.ASCII.GetBytes(reg);
             byte[] _no = Encoding.ASCII.GetBytes(Right("00000" + no.ToString(), 5));
-            byte[] _val = Encoding.ASCII.GetBytes(Right("0000" + val.ToString(), 4));
+            string HexString = Convert.ToString(val, 16).ToUpper();
+            byte[] _val = Encoding.ASCII.GetBytes(Right("0000" + HexString, 4));
             byte[] RevCmd = new byte[20];
             RevCmd[0] = 0x02;
             RevCmd[1] = _id[0];
@@ -39,22 +60,19 @@ namespace ModbusLibrary
             RevCmd[14] = _val[1];
             RevCmd[15] = _val[2];
             RevCmd[16] = _val[3];
-            int _total = 0;
-            for (int i = 0; i < 17; i++)
-                _total += RevCmd[i];
-            string hex = Convert.ToString(_total, 16).ToUpper();
-            byte[] _check = Encoding.ASCII.GetBytes(hex);
-            RevCmd[17] = _check[1];
-            RevCmd[18] = _check[2];
+            byte[] LRC = MakeLRCFatek(RevCmd, 0, 17);
+            RevCmd[17] = LRC[0];
+            RevCmd[18] = LRC[1];
             RevCmd[19] = 0x03;
             return RevCmd;
         }
 
-        public byte[] FatekCmd16bits(byte id, byte func, byte amount, string reg, int no)
+        public byte[]  FatekCmd16bits(byte id, byte func, byte amount, string reg, int no)
         {
             byte[] _id = Encoding.ASCII.GetBytes(Right("00" + id.ToString(), 2));
             byte[] _func = Encoding.ASCII.GetBytes(Right("00" + func.ToString(), 2));
-            byte[] _amount = Encoding.ASCII.GetBytes(Right("00" + amount.ToString(), 2));
+            string HexAmount = Convert.ToString(amount, 16).ToUpper();                  //實際數量轉成16進制
+            byte[] _amount = Encoding.ASCII.GetBytes(Right("00" + HexAmount, 2));       //整理數量字串為ASCII
             byte[] _reg = Encoding.ASCII.GetBytes(reg);
             byte[] _no = Encoding.ASCII.GetBytes(Right("00000" + no.ToString(), 5));
             byte[] RevCmd = new byte[16];
@@ -71,13 +89,9 @@ namespace ModbusLibrary
             RevCmd[10] = _no[2];
             RevCmd[11] = _no[3];
             RevCmd[12] = _no[4];
-            int _total = 0;
-            for (int i = 0; i < 14; i++)
-                _total += RevCmd[i];
-            string hex = Convert.ToString(_total, 16).ToUpper();
-            byte[] _check = Encoding.ASCII.GetBytes(hex);
-            RevCmd[13] = _check[1];
-            RevCmd[14] = _check[2];
+            byte[] LRC = MakeLRCFatek(RevCmd, 0, 13);
+            RevCmd[13] = LRC[0];
+            RevCmd[14] = LRC[1];
             RevCmd[15] = 0x03;
             return RevCmd;
         }
@@ -133,10 +147,10 @@ namespace ModbusLibrary
             byte[] RevCmd = new byte[8];
             RevCmd[0] = id;
             RevCmd[1] = func;
-            RevCmd[2] = MCmd[0];
-            RevCmd[3] = MCmd[1];
-            RevCmd[4] = MLen[0];
-            RevCmd[5] = MLen[1];
+            RevCmd[2] = MCmd[1];
+            RevCmd[3] = MCmd[0];
+            RevCmd[4] = MLen[1];
+            RevCmd[5] = MLen[0];
             byte[] crc16 = MakeCRC16(RevCmd, 0, 6);
             RevCmd[6] = crc16[1];
             RevCmd[7] = crc16[0];
@@ -162,6 +176,8 @@ namespace ModbusLibrary
             RevCmd[11] = MLen[0];
             return RevCmd;
         }
+
+
 
         public byte[] MakeCRC16(byte[] data, byte startIndex, byte len)
         {
@@ -198,6 +214,33 @@ namespace ModbusLibrary
             ReturnData[0] = CRC16Hi;       //'CRC高位
             ReturnData[1] = CRC16Lo;      //'CRC低位
             return ReturnData;
+        }
+
+        public byte[] MakeLRCFatek(byte[] data, int startIndex, int len)
+        {
+            int TotalSum = 0;
+            for (int i = startIndex; i < len; i++)
+                TotalSum += data[i];
+            string HexString = Convert.ToString(TotalSum, 16).ToUpper();        //轉變16進制
+            string HexLRC = Right("00" + HexString, 2);                         //LRC數值計算
+            byte[] LRC = Encoding.ASCII.GetBytes(HexLRC);
+            return LRC;
+        }
+
+        public bool CheckLRCFatek(byte[] response)
+        {
+            try
+            {
+                int ResLen = response.Length;
+                byte[] lrc = MakeLRCFatek(response, 0, (ResLen - 3));
+                if (response[ResLen - 3] == lrc[0] && response[ResLen - 2] == lrc[1])
+                    return true;
+                return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         public bool CheckCRC16(byte[] response)
