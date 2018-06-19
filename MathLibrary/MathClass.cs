@@ -300,7 +300,7 @@ namespace MathLibrary
         public string work10to2(byte Data)
         {
             string bin = "00000000";
-            bin = ("00000000" + Convert.ToString(Data, 2)).Right(16);
+            bin = ("00000000" + Convert.ToString(Data, 2)).Right(8);
             return bin;
         }
 
@@ -308,6 +308,14 @@ namespace MathLibrary
         {
             string bin = "0000000000000000";
             bin = ("0000000000000000" + Convert.ToString(DataH, 2) + Convert.ToString(DataL, 2)).Right(16);
+            return bin;
+        }
+
+        public string work10to2(string _val)
+        {
+            string bin = "00000000";
+            byte ans = Convert.ToByte(_val, 16);
+            bin = ("00000000" + Convert.ToString(ans, 2)).Right(8);
             return bin;
         }
 
