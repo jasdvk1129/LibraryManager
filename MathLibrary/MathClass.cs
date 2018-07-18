@@ -93,14 +93,6 @@ namespace MathLibrary
             return ans;
         }
 
-        public string Reverse(string str)
-        {
-            char[] caArray = str.ToCharArray();
-            Array.Reverse(caArray);            //將char array中的元素位置反轉
-            string str2 = new string(caArray); //將反轉完的char array轉回字串
-            return str2;
-        }
-
         public int work16to10(string _val)
         {
             int ans = 0;
@@ -307,7 +299,7 @@ namespace MathLibrary
         public string work10to2(byte DataH, byte DataL)
         {
             string bin = "0000000000000000";
-            bin = ("0000000000000000" + Convert.ToString(DataH, 2) + Convert.ToString(DataL, 2)).Right(16);
+            bin = ("00000000" + Convert.ToString(DataH, 2)).Right(8) + ("00000000" + Convert.ToString(DataL, 2)).Right(8);
             return bin;
         }
 
@@ -316,6 +308,17 @@ namespace MathLibrary
             string bin = "00000000";
             byte ans = Convert.ToByte(_val, 16);
             bin = ("00000000" + Convert.ToString(ans, 2)).Right(8);
+            return bin;
+        }
+
+        public string work10to2(byte[] Data, int startindex, int dataLength)
+        {
+            string bin = "";
+            for (int i = startindex; i < (startindex + dataLength); i++)
+            {
+                string nowData = "00000000" + Convert.ToString(Data[i], 2).Right(8);
+                bin += nowData;
+            }
             return bin;
         }
 
