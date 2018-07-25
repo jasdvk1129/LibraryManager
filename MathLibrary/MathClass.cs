@@ -316,8 +316,8 @@ namespace MathLibrary
             string bin = "";
             for (int i = startindex; i < (startindex + dataLength); i++)
             {
-                string nowData = "00000000" + Convert.ToString(Data[i], 2).Right(8);
-                bin += nowData;
+                string nowData = ("00000000" + Convert.ToString(Data[i], 2)).Right(8);
+                bin += StrReverse(nowData);
             }
             return bin;
         }
