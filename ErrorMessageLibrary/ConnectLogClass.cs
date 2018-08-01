@@ -24,8 +24,8 @@ namespace ErrorMessageLibrary
                         Directory.CreateDirectory(WorkPath + "\\Connected");
                     string FileName = WorkPath + "\\Connected\\" + NowTime.ToString("yyyyMMdd") + ".txt";
                     StreamWriter connectstatefile = new StreamWriter(FileName, true, coding);
-                    connectstatefile.WriteLine(NowTime.ToString("yyyy/MM/dd HH:mm:ss") + "\t\t\t" + _Message);
-                    DisplayTextBox.Text += NowTime.ToString("yyyy/MM/dd HH:mm:ss") + "\t\t" + _Message + Environment.NewLine;
+                    connectstatefile.WriteLine(NowTime.ToString("yyyy/MM/dd HH:mm:ss.fff") + "\t\t\t" + _Message);
+                    DisplayTextBox.Text += NowTime.ToString("yyyy/MM/dd HH:mm:ss.fff") + "\t\t" + _Message + Environment.NewLine;
                     connectstatefile.Close();
                 }
                 catch (Exception ex)

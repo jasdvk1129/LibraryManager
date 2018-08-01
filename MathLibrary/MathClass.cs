@@ -330,5 +330,49 @@ namespace MathLibrary
             str = new string(ArrayStr);
             return str;
         }
+
+        public string WeekValueToString(int WeekValue)
+        {
+            string ValueWeek = "";
+            switch (WeekValue)
+            {
+                case 0:
+                    {
+                        ValueWeek = "Sunday";
+                        break;
+                    }
+                case 1:
+                    {
+                        ValueWeek = "Monday";
+                        break;
+                    }
+                case 2:
+                    {
+                        ValueWeek = "Tuesday";
+                        break;
+                    }
+                case 3:
+                    {
+                        ValueWeek = "Wednesday";
+                        break;
+                    }
+                case 4:
+                    {
+                        ValueWeek = "Thursday";
+                        break;
+                    }
+                case 5:
+                    {
+                        ValueWeek = "Friday";
+                        break;
+                    }
+                case 6:
+                    {
+                        ValueWeek = "Saturday";
+                        break;
+                    }
+            }
+            return ValueWeek;
+        }
     }
 }
