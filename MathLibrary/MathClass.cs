@@ -86,6 +86,18 @@ namespace MathLibrary
             return ans;
         }
 
+        public long work16to10(byte dataHH, byte dataHL, byte dataLH, byte dataLL, bool _negative)
+        {
+            long ans = 0;
+            long H = dataHH * 256 + dataHL;
+            long L = dataLH * 256 + dataLL;
+            ans = H * 65536 + L;
+            if (_negative)
+                if (ans > 2147483648)
+                    ans = ans - 4294967295;
+            return ans;
+        }
+
         public int work2to10(string str2)
         {
             int ans = 0;
