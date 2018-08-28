@@ -8,6 +8,7 @@ namespace DeviceLibrary
 {
     public class AEMDRAClass
     {
+        /* 銓盛電表 AEMDRA */
         public byte ID { get; set; }                            //設備ID
         public byte MA_StartAddrHigh { get; private set; } = 0x10;      //
         public byte MA_StartAddrLow { get; private set; } = 0x01;       //
@@ -93,24 +94,73 @@ namespace DeviceLibrary
         public float[] BB_Q { get; private set; } = new float[12];
         public float[] BB_S { get; private set; } = new float[12];
         public float[] BB_PF { get; private set; } = new float[12];
-
+        /// <summary>
+        /// 解析MA的數值
+        /// </summary>
+        /// <param name="Inbyte">資料匯入</param>
+        /// <returns>回傳解析是否成功</returns>
         public bool AnalysisDataByte_MA(byte[] Inbyte)
         {
             try
             {
                 MathClass Calculate = new MathClass();
                 int k = 3;
-                MB_V1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
-                MB_V2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
-                MB_V3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
-                MB_V = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
-                MB_U12 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
-                MB_U23 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
-                MB_U31 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
-                MB_U = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
-                MB_I1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
-                MB_I2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
-                MB_I3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                MA_V1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
+                MA_V2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
+                MA_V3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
+                MA_V = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
+                MA_U12 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
+                MA_U23 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
+                MA_U31 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
+                MA_U = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; k += 4;
+                MA_I1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                MA_I2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                MA_I3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                MA_I = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                MA_IN = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_P1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_P2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_P3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_P = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_Q1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_Q2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_Q3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_Q = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_S1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_S2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_S3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_S = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                MA_PF1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
+                MA_PF2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
+                MA_PF3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
+                MA_PF = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
+            }
+            catch (Exception)
+            { return false; }
+            return true;
+        }
+        /// <summary>
+        /// 解析MB的數值
+        /// </summary>
+        /// <param name="Inbyte">資料匯入</param>
+        /// <returns>回傳解析是否成功</returns>
+        public bool AnalysisDataByte_MB(byte[] Inbyte)
+        {
+            try
+            {
+                MathClass Calculate = new MathClass();
+                int k = 3;
+                MB_V1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
+                MB_V2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
+                MB_V3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
+                MB_V = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
+                MB_U12 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
+                MB_U23 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
+                MB_U31 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
+                MB_U = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
+                MB_I1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; ; k += 4;
+                MB_I2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; ; k += 4;
+                MB_I3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; ; k += 4;
                 MB_I = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
                 MB_IN = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
                 MB_P1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
@@ -134,42 +184,73 @@ namespace DeviceLibrary
             { return false; }
             return true;
         }
-
-        public bool AnalysisDataByte_MB(byte[] Inbyte)
+        /// <summary>
+        /// 解析BA數值
+        /// </summary>
+        /// <param name="Inbyte">資料匯入</param>
+        /// <param name="DataIndex">Channel起始編號(請輸入0,3,6,9)</param>
+        /// <returns>回傳解析是否成功</returns>
+        public bool AnalysisDataByte_BA(byte[] Inbyte, int DataIndex)
         {
             try
             {
                 MathClass Calculate = new MathClass();
-                int k = 3;
-                MA_V1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
-                MA_V2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
-                MA_V3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
-                MA_V = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
-                MA_U12 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
-                MA_U23 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
-                MA_U31 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
-                MA_U = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.1F; ; k += 4;
-                MA_I1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; ; k += 4;
-                MA_I2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; ; k += 4;
-                MA_I3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; ; k += 4;
-                MA_I = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
-                MA_IN = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_P1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_P2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_P3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_P = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_Q1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_Q2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_Q3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_Q = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_S1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_S2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_S3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_S = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
-                MA_PF1 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
-                MA_PF2 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
-                MA_PF3 = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
-                MA_PF = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
+                int k = 3; float Space;
+                BA_I[DataIndex] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                BA_I[DataIndex + 1] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                BA_I[DataIndex + 2] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                Space = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                BA_P[DataIndex] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BA_P[DataIndex + 1] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BA_P[DataIndex + 2] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                Space = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BA_Q[DataIndex] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BA_Q[DataIndex + 1] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BA_Q[DataIndex + 2] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                Space = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BA_S[DataIndex] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BA_S[DataIndex + 1] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BA_S[DataIndex + 2] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                Space = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BA_PF[DataIndex] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
+                BA_PF[DataIndex + 1] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
+                BA_PF[DataIndex + 2] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
+            }
+            catch (Exception)
+            { return false; }
+            return true;
+        }
+        /// <summary>
+        /// 解析BB數值
+        /// </summary>
+        /// <param name="Inbyte">資料匯入</param>
+        /// <param name="DataIndex">Channel起始編號(請輸入0,3,6,9)</param>
+        /// <returns>回傳解析是否成功</returns>
+        public bool AnalysisDataByte_BB(byte[] Inbyte, int DataIndex)
+        {
+            try
+            {
+                MathClass Calculate = new MathClass();
+                int k = 3; float Space;
+                BB_I[DataIndex] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                BB_I[DataIndex + 1] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                BB_I[DataIndex + 2] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                Space = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true) * 0.001F; k += 4;
+                BB_P[DataIndex] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BB_P[DataIndex + 1] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BB_P[DataIndex + 2] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                Space = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BB_Q[DataIndex] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BB_Q[DataIndex + 1] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BB_Q[DataIndex + 2] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                Space = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BB_S[DataIndex] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BB_S[DataIndex + 1] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BB_S[DataIndex + 2] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                Space = Calculate.work16to10(Inbyte[k], Inbyte[k + 1], Inbyte[k + 2], Inbyte[k + 3], true); k += 4;
+                BB_PF[DataIndex] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
+                BB_PF[DataIndex + 1] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
+                BB_PF[DataIndex + 2] = Calculate.work16to10(Inbyte[k], Inbyte[k + 1]) * 0.001F; k += 2;
             }
             catch (Exception)
             { return false; }
