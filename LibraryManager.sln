@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModbusReceiveLibrary", "Mod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceLibrary", "DeviceLibrary\DeviceLibrary.csproj", "{2E849E0F-6BD7-447D-88D2-E13DDA3FFDBF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LineNotifyLibrary", "LineNotifyLibrary\LineNotifyLibrary.csproj", "{ADA914A0-4975-451E-80C5-0BA8ACE24B1B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{2E849E0F-6BD7-447D-88D2-E13DDA3FFDBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E849E0F-6BD7-447D-88D2-E13DDA3FFDBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E849E0F-6BD7-447D-88D2-E13DDA3FFDBF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADA914A0-4975-451E-80C5-0BA8ACE24B1B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADA914A0-4975-451E-80C5-0BA8ACE24B1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADA914A0-4975-451E-80C5-0BA8ACE24B1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADA914A0-4975-451E-80C5-0BA8ACE24B1B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
