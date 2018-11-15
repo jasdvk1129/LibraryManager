@@ -17,7 +17,11 @@ namespace LineNotifyLibrary
         private string ContentType = "application/x-www-form-urlencoded";
         private string Method = "POST";
         private string URL = "https://notify-api.line.me/api/notify";
-
+        /// <summary>
+        /// Line發送純文字
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public string SendLineNotify(string message)
         {
             string BearerToken = "Bearer " + Token;
@@ -45,7 +49,13 @@ namespace LineNotifyLibrary
             { responseStr = ex.Message.ToString(); }
             return responseStr;
         }
-
+        /// <summary>
+        /// Line發送含貼圖功能
+        /// </summary>
+        /// <param name="message"></param>
+        /// <param name="stickerPackageId"></param>
+        /// <param name="stickerId"></param>
+        /// <returns></returns>
         public string SendLineNotify(string message, int stickerPackageId, int stickerId)
         {
             Token = string.Format("Bearer {0}", Token);
