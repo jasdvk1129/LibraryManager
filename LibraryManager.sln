@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29102.190
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.757
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseLibrary", "DatabaseLibrary\DatabaseLibrary.csproj", "{8FF2AECB-F940-413F-9E5B-E4B3D8C0F379}"
 EndProject
@@ -14,6 +14,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModbusLibrary", "ModbusLibrary\ModbusLibrary.csproj", "{27414BF9-6F09-4053-B206-8B7B111A0829}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModbusReceiveLibrary", "ModbusReceiveLibrary\ModbusReceiveLibrary.csproj", "{3F21A14F-2B91-4B15-BD46-62D80B108ED6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LineNotifyLibrary", "LineNotifyLibrary\LineNotifyLibrary.csproj", "{C6028FEE-1498-48FF-94D1-2F935DC64A77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLSwitchLibrary", "SQLSwitchLibrary\SQLSwitchLibrary.csproj", "{97DA682C-E0AD-4F38-8C7B-F3D1AF456E2C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPClientServerLibrary", "TCPClientServerLibrary\TCPClientServerLibrary.csproj", "{A938D727-ADD1-4D29-999B-777FA19A8E00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +51,18 @@ Global
 		{3F21A14F-2B91-4B15-BD46-62D80B108ED6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F21A14F-2B91-4B15-BD46-62D80B108ED6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F21A14F-2B91-4B15-BD46-62D80B108ED6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6028FEE-1498-48FF-94D1-2F935DC64A77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6028FEE-1498-48FF-94D1-2F935DC64A77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6028FEE-1498-48FF-94D1-2F935DC64A77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6028FEE-1498-48FF-94D1-2F935DC64A77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{97DA682C-E0AD-4F38-8C7B-F3D1AF456E2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97DA682C-E0AD-4F38-8C7B-F3D1AF456E2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97DA682C-E0AD-4F38-8C7B-F3D1AF456E2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97DA682C-E0AD-4F38-8C7B-F3D1AF456E2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A938D727-ADD1-4D29-999B-777FA19A8E00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A938D727-ADD1-4D29-999B-777FA19A8E00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A938D727-ADD1-4D29-999B-777FA19A8E00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A938D727-ADD1-4D29-999B-777FA19A8E00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
