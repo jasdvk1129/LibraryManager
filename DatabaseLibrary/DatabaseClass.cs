@@ -1,8 +1,9 @@
-﻿using System;
+﻿using ErrorMessageLibrary;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using ErrorMessageLibrary;
+
 
 namespace DatabaseLibrary
 {
@@ -461,7 +462,12 @@ namespace DatabaseLibrary
             ConnTxt.Close();
             return RecordFlog;
         }
-
+        /// <summary>
+        /// 修改資料函式
+        /// </summary>
+        /// <param name="_tablename"></param>
+        /// <param name="_command"></param>
+        /// <returns></returns>
         public bool EditDataLogFunction(string _tablename, string _command)
         {
             bool RecordFlog = false;
@@ -490,7 +496,14 @@ namespace DatabaseLibrary
             ConnTxt.Close();
             return RecordFlog;
         }
-
+        /// <summary>
+        /// 修改資料函式
+        /// </summary>
+        /// <param name="_tablename"></param>
+        /// <param name="_command"></param>
+        /// <param name="_condition"></param>
+        /// <param name="_connstr"></param>
+        /// <returns></returns>
         public bool EditDataLogFunction(string _tablename, string _command, string _condition, string _connstr)
         {
             bool RecordFlog = false;
@@ -519,7 +532,12 @@ namespace DatabaseLibrary
             ConnTxt.Close();
             return RecordFlog;
         }
-
+        /// <summary>
+        /// 取得總資料筆數函式
+        /// </summary>
+        /// <param name="_tablename">資料表名稱</param>
+        /// <param name="_condition">過濾條件</param>
+        /// <returns>資料筆數</returns>
         public int GetDataAmountFunction(string _tablename, string _condition)
         {
             int mAmount = 0;
@@ -550,7 +568,13 @@ namespace DatabaseLibrary
             ConnTxt.Close();
             return mAmount;
         }
-
+        /// <summary>
+        /// 取得總資料筆數函式
+        /// </summary>
+        /// <param name="_tablename">資料表名稱</param>
+        /// <param name="_condition">過濾條件</param>
+        /// <param name="_connstr">資料庫連接字串</param>
+        /// <returns>資料筆數</returns>
         public int GetDataAmountFunction(string _tablename, string _condition, string _connstr)
         {
             int mAmount = 0;
@@ -581,7 +605,11 @@ namespace DatabaseLibrary
             ConnTxt.Close();
             return mAmount;
         }
-
+        /// <summary>
+        /// 取得總資料筆數函式(使用預設字串)
+        /// </summary>
+        /// <param name="_tablename">資料表名稱</param>
+        /// <returns>資料筆數</returns>
         public int GetTotalDataAmountFunction(string _tablename)
         {
             int mAmount = 0;
@@ -612,7 +640,12 @@ namespace DatabaseLibrary
             ConnTxt.Close();
             return mAmount;
         }
-
+        /// <summary>
+        /// 取得總資料筆數函式
+        /// </summary>
+        /// <param name="_tablename">資料表名稱</param>
+        /// <param name="_connstr">資料庫連接字串</param>
+        /// <returns>資料筆數</returns>
         public int GetTotalDataAmountFunction(string _tablename, string _connstr)
         {
             int mAmount = 0;
@@ -642,6 +675,59 @@ namespace DatabaseLibrary
             }
             ConnTxt.Close();
             return mAmount;
+        }
+        /// <summary>
+        /// 告警資訊歷史訊息清單
+        /// </summary>
+        /// <param name="nowTime">現在時間</param>
+        /// <param name="GID">Gateway編號</param>
+        /// <param name="DeviceIndex">設備編號</param>
+        /// <param name="MessageText">告警訊息</param>
+        /// <param name="ConnStrLog">資料庫連接字串</param>
+        /// <returns></returns>
+        public bool AlarmInfomationLogger(DateTime nowTime, int GID, int DeviceIndex, string MessageText, string ConnStrLog)
+        {
+            if (CheckDatabaseExistFunction(nowTime))
+            {
+                if (!CheckDataTableExistFunction("Alarm_Log", ConnStrLog))
+                {
+                    CreateDataTableFunction("Alarm_Log", "AlarmID INT IDENTITY PRIMARY KEY,ttime VARCHAR(14) DEFAULT '',ttimen DATETIME,GID INT DEFAULT 0,DeviceIndex INT DEFAULT 0,MessageText NVARCHAR(100) DEFAULT '',SendFlag INT DEFAULT 0", ConnStrLog);
+                }
+                SqlConnection ConnTxt = new SqlConnection(ConnStrLog);
+                if (ConnTxt.State == ConnectionState.Closed)
+                    ConnTxt.Open();
+                string SelectCheckAlarm = $"SELECT * FROM Alarm_Log WHERE MessageText = '{MessageText}'";
+                try
+                {
+                    SqlCommand CmdCheckAlarm = new SqlCommand(SelectCheckAlarm, ConnTxt);
+                    SqlDataReader CheckAlarm = CmdCheckAlarm.ExecuteReader();
+                    if (!CheckAlarm.HasRows)
+                    {
+                        CheckAlarm.Close();
+                        string InsertNewAlarmData = $"INSERT INTO Alarm_Log(ttime,ttimen,GID,DeviceIndex,MessageText) VALUES ('{nowTime.ToString("yyyyMMddHHmmss")}','{nowTime.ToString("yyyy/MM/dd HH:mm:ss")}',{GID},{DeviceIndex},'{MessageText}')";
+                        try
+                        {
+                            SqlCommand CmdNewAlarmData = new SqlCommand(InsertNewAlarmData, ConnTxt);
+                            int NewAlarmData = CmdNewAlarmData.ExecuteNonQuery();
+                            if (NewAlarmData > 0)
+                            {
+                                ConnTxt.Close();
+                                return true;
+                            }
+                        }
+                        catch (Exception ex)
+                        { ErrMsg._errorText(InsertNewAlarmData, ex); }
+                    }
+                    else
+                    {
+                        CheckAlarm.Close();
+                    }
+                }
+                catch (Exception ex)
+                { ErrMsg._errorText(SelectCheckAlarm, ex); }
+                ConnTxt.Close();
+            }
+            return false;
         }
     }
 }

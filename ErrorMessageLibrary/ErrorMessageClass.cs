@@ -20,6 +20,23 @@ namespace ErrorMessageLibrary
         private Encoding coding = Encoding.Default;
         public RichTextBox DisplayTextBox;
         private object _thislock = new object();
+
+        #region TextObject更新委派
+        private delegate void UpdateUICallBack_Text(Control TextUI, string Newtext);
+        private void UpdateUIText(Control TextUI, string Newtext)
+        {
+            if (TextUI.InvokeRequired)
+            {
+                UpdateUICallBack_Text invokeDelegate = new UpdateUICallBack_Text(UpdateUIText);
+                TextUI.Invoke(invokeDelegate, TextUI, Newtext);
+            }
+            else
+            {
+                TextUI.Text = Newtext;
+            }
+        }
+        #endregion
+
         /// <summary>
         /// 錯誤訊息攔截、紀錄及顯示
         /// </summary>
@@ -50,7 +67,7 @@ namespace ErrorMessageLibrary
                 errtext += "ex.ToString = " + ex.ToString() + "/n";
                 errtext += "ex.Message = " + ex.Message + "/n";
                 errtext += "ex.StackTrace = " + ex.StackTrace + "/n";
-                DisplayTextBox.Text = errtext;
+                UpdateUIText(DisplayTextBox, errtext);
             }
         }
         /// <summary>
