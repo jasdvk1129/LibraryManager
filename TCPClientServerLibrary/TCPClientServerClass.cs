@@ -9,11 +9,15 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using static NetworkCommsDotNet.Tools.StreamTools;
+using ErrorMessageLibrary;
+
 
 namespace TCPClientServerLibrary
 {
     public class TCPClientServerClass
     {
+        public ErrorMessageClass ErrMsg { get; set; } = new ErrorMessageClass() { _WorkPath=AppDomain.CurrentDomain.BaseDirectory };
+
         #region TCPClient
         /// <summary>
         /// 傳送訊息
@@ -28,9 +32,9 @@ namespace TCPClientServerLibrary
             {
                 NetworkComms.SendObject(Token, IPaddress, Port, Message);
             }
-            catch (ArgumentException) { Console.WriteLine("網路通訊異常請檢查"); }
-            catch (ConnectionSetupException) { Console.WriteLine("網路通訊異常請檢查"); }
-            catch (ConnectionSendTimeoutException) { Console.WriteLine("接收端程式異常"); }
+            catch (ArgumentException ex) { ErrMsg._errorText("網路通訊異常請檢查", ex); Console.WriteLine("網路通訊異常請檢查"); }
+            catch (ConnectionSetupException ex) { ErrMsg._errorText("網路通訊異常請檢查", ex); Console.WriteLine("網路通訊異常請檢查"); }
+            catch (ConnectionSendTimeoutException ex) { ErrMsg._errorText("接收端程式異常", ex); Console.WriteLine("接收端程式異常"); }
         }
         /// <summary>
         /// 傳送檔案
@@ -60,16 +64,16 @@ namespace TCPClientServerLibrary
                             NetworkComms.SendObject(Token, IPaddress, Port, sendWrapper);
                             fileStream.Close();
                         }
-                        catch (ArgumentException) { Console.WriteLine("網路通訊異常請檢查"); }
-                        catch (ConnectionSetupException) { Console.WriteLine("網路通訊異常請檢查"); }
-                        catch (ConnectionSendTimeoutException) { Console.WriteLine("接收端程式異常"); }
+                        catch (ArgumentException ex) { ErrMsg._errorText("網路通訊異常請檢查", ex); Console.WriteLine("網路通訊異常請檢查"); }
+                        catch (ConnectionSetupException ex) { ErrMsg._errorText("網路通訊異常請檢查", ex); Console.WriteLine("網路通訊異常請檢查"); }
+                        catch (ConnectionSendTimeoutException ex) { ErrMsg._errorText("接收端程式異常", ex); Console.WriteLine("接收端程式異常"); }
                     }
                     break;
                 }
             }
-            catch (FileNotFoundException) { Console.WriteLine("搜尋不到或未有檔案產生"); }
-            catch (ObjectDisposedException) { Console.WriteLine("檔案刪除後未有檔案產生"); }
-            catch (DirectoryNotFoundException) { Console.WriteLine("找不到檔案路徑"); }
+            catch (FileNotFoundException ex) { ErrMsg._errorText("搜尋不到或未有檔案產生", ex); Console.WriteLine("搜尋不到或未有檔案產生"); }
+            catch (ObjectDisposedException ex) { ErrMsg._errorText("檔案刪除後未有檔案產生", ex); Console.WriteLine("檔案刪除後未有檔案產生"); }
+            catch (DirectoryNotFoundException ex) { ErrMsg._errorText("找不到檔案路徑", ex); Console.WriteLine("找不到檔案路徑"); }
         }
         #endregion
 
