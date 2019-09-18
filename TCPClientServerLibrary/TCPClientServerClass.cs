@@ -11,11 +11,13 @@ using System.Threading.Tasks;
 using static NetworkCommsDotNet.Tools.StreamTools;
 using ErrorMessageLibrary;
 
+
 namespace TCPClientServerLibrary
 {
     public class TCPClientServerClass
     {
         public ErrorMessageClass ErrMsg { get; set; } = new ErrorMessageClass() { _WorkPath=AppDomain.CurrentDomain.BaseDirectory };
+
         #region TCPClient
         /// <summary>
         /// 傳送訊息
