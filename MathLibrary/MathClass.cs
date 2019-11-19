@@ -24,14 +24,11 @@ namespace MathLibrary
             }
             return retVal;
         }
-
-        public byte[] work10to16(int _val)
-        {
-            ushort org = Convert.ToUInt16(_val);
-            byte[] ans = BitConverter.GetBytes(org);
-            return ans;
-        }
-
+        /// <summary>
+        /// 16進制字串轉IEEE754
+        /// </summary>
+        /// <param name="_val"></param>
+        /// <returns></returns>
         public float work16to754(string _val)
         {
             float ans = 0;
@@ -43,7 +40,27 @@ namespace MathLibrary
             ans = BitConverter.ToSingle(_temp, 0);
             return ans;
         }
-
+        /// <summary>
+        /// 10進制整數轉IEEE754(CDAB)
+        /// </summary>
+        /// <param name="Hibyte"></param>
+        /// <param name="Lobyte"></param>
+        /// <returns></returns>
+        public float work16to754(ushort Hibyte, ushort Lobyte)
+        {
+            byte[] HighByte = BitConverter.GetBytes(Hibyte);
+            byte[] LowByte = BitConverter.GetBytes(Lobyte);
+            float ans = work16to754(HighByte[1], HighByte[0], LowByte[1], LowByte[0]);
+            return ans;
+        }
+        /// <summary>
+        /// 16進制轉IEEE754
+        /// </summary>
+        /// <param name="dataHH"></param>
+        /// <param name="dataHL"></param>
+        /// <param name="dataLH"></param>
+        /// <param name="dataLL"></param>
+        /// <returns></returns>
         public float work16to754(byte dataHH, byte dataHL, byte dataLH, byte dataLL)
         {
             float ans = 0;
@@ -55,11 +72,53 @@ namespace MathLibrary
             ans = BitConverter.ToSingle(_temp, 0);
             return ans;
         }
-
+        /// <summary>
+        /// 16進制轉10進制整數
+        /// </summary>
+        /// <param name="dataH">高位元</param>
+        /// <param name="dataL">低位元</param>
+        /// <param name="negative">是否為負數</param>
+        /// <returns></returns>
+        public int work16to10(byte dataH, byte dataL, bool negative = false)
+        {
+            int ans = 0;
+            ans = dataH * 256 + dataL;
+            if (negative)
+                if (ans >= 32768)
+                    ans -= 65536;
+            return ans;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dataHH"></param>
+        /// <param name="dataHL"></param>
+        /// <param name="dataLH"></param>
+        /// <param name="dataLL"></param>
+        /// <returns></returns>
+        public int work16to10(byte dataHH, byte dataHL, byte dataLH, byte dataLL)
+        {
+            int ans = 0;
+            int H = dataHH * 256 + dataHL;
+            int L = dataLH * 256 + dataLL;
+            ans = H * 256 + L;
+            return ans;
+        }
+        /// <summary>
+        /// 16進制轉10進制長整數
+        /// </summary>
+        /// <param name="dataHHH"></param>
+        /// <param name="dataHHL"></param>
+        /// <param name="dataHH"></param>
+        /// <param name="dataHL"></param>
+        /// <param name="dataLH"></param>
+        /// <param name="dataLL"></param>
+        /// <param name="dataLLH"></param>
+        /// <param name="dataLLL"></param>
+        /// <returns></returns>
         public long work16to10(byte dataHHH, byte dataHHL, byte dataHH, byte dataHL, byte dataLH, byte dataLL, byte dataLLH, byte dataLLL)
         {
-            long ans = 0;
-            ans = dataLLH * 256 + dataLLL;
+            long ans = dataLLH * 256 + dataLLL;
             int HH = dataHHH * 256 + dataHHL;
             int HL = dataHH * 256 + dataHL;
             int LH = dataLH * 256 + dataLL;
@@ -69,55 +128,62 @@ namespace MathLibrary
             ans = H * 65536 + L;
             return ans;
         }
-
-        public int work16to10(byte dataH, byte dataL)
+        /// <summary>
+        /// 16進制轉10進制長整數
+        /// </summary>
+        /// <param name="dataHH"></param>
+        /// <param name="dataHL"></param>
+        /// <param name="dataLH"></param>
+        /// <param name="dataLL"></param>
+        /// <param name="negative"></param>
+        /// <returns></returns>
+        public long work16to10(byte dataHH, byte dataHL, byte dataLH, byte dataLL, bool negative = false)
         {
-            int ans = 0;
-            ans = dataH * 256 + dataL;
-            return ans;
-        }
-
-        public int work16to10(byte dataHH, byte dataHL, byte dataLH, byte dataLL)
-        {
-            int ans = 0;
-            int H = dataHH * 256 + dataHL;
-            int L = dataLH * 256 + dataLL;
-            ans = H * 256 + L;
-            return ans;
-        }
-
-        public long work16to10(byte dataHH, byte dataHL, byte dataLH, byte dataLL, bool _negative)
-        {
-            long ans = 0;
             long H = dataHH * 256 + dataHL;
             long L = dataLH * 256 + dataLL;
-            ans = H * 65536 + L;
-            if (_negative)
+            long ans = H * 65536 + L;
+            if (negative)
                 if (ans > 2147483648)
-                    ans = ans - 4294967295;
+                    ans -= 4294967295;
             return ans;
         }
-
+        /// <summary>
+        /// 2進制轉10進制
+        /// </summary>
+        /// <param name="str2"></param>
+        /// <returns></returns>
         public int work2to10(string str2)
         {
-            int ans = 0;
-            ans = Convert.ToInt32(str2, 2);
+            int ans = Convert.ToInt32(str2, 2);
             return ans;
         }
-
+        /// <summary>
+        /// 16進制字串轉10進制
+        /// </summary>
+        /// <param name="_val"></param>
+        /// <returns></returns>
         public int work16to10(string _val)
         {
-            int ans = 0;
-            ans = Convert.ToInt32(_val, 16);
+            int ans = Convert.ToInt32(_val, 16);
             return ans;
         }
-
+        /// <summary>
+        /// 16進制陣列轉10進制
+        /// </summary>
+        /// <param name="_data"></param>
+        /// <returns></returns>
         public int work16to10(byte[] _data)
         {
             int ans = BitConverter.ToInt32(_data, 0);
             return ans;
         }
-
+        /// <summary>
+        /// 16進制陣列轉10進制
+        /// </summary>
+        /// <param name="_data"></param>
+        /// <param name="startindex"></param>
+        /// <param name="len"></param>
+        /// <returns></returns>
         public int work16to10(byte[] _data, int startindex, int len)
         {
             byte[] newArray = new byte[len];            //建立新陣列
@@ -127,20 +193,12 @@ namespace MathLibrary
             return ans;
         }
         /// <summary>
-        /// WORD 16進制轉10進制
+        /// 陣列切割
         /// </summary>
-        /// <param name="_dataH"></param>
-        /// <param name="_dataL"></param>
-        /// <returns>不含正負號之整數</returns>
-        public int work16to10(byte _dataH, byte _dataL, bool _negative)
-        {
-            int ans = _dataH * 256 + _dataL;
-            if (_negative)
-                if (ans >= 32767)
-                    ans -= 65536;
-            return ans;
-        }
-
+        /// <param name="orgArray"></param>
+        /// <param name="startindex"></param>
+        /// <param name="newlength"></param>
+        /// <returns></returns>
         public byte[] SpiltArray(byte[] orgArray, int startindex, int newlength)
         {
             byte[] newArray = new byte[newlength];
@@ -223,7 +281,11 @@ namespace MathLibrary
             ans += _Emend;
             return ans;
         }
-
+        /// <summary>
+        /// AI轉換
+        /// </summary>
+        /// <param name="heat"></param>
+        /// <returns></returns>
         private double AiTransform(int heat)
         {
             int rt = heat;
@@ -252,10 +314,16 @@ namespace MathLibrary
             T = Math.Round(T, 1);
             return T;
         }
-
+        /// <summary>
+        /// 三數字取最大值
+        /// </summary>
+        /// <param name="val1"></param>
+        /// <param name="val2"></param>
+        /// <param name="val3"></param>
+        /// <returns></returns>
         public double MaxValue(double val1, double val2, double val3)
         {
-            double ans = 0;
+            double ans;
             if (val1 > val2)
                 ans = val1;
             else
@@ -264,6 +332,14 @@ namespace MathLibrary
                 ans = val3;
             return ans;
         }
+        /// <summary>
+        /// 四數字取最大值
+        /// </summary>
+        /// <param name="val1"></param>
+        /// <param name="val2"></param>
+        /// <param name="val3"></param>
+        /// <param name="val4"></param>
+        /// <returns></returns>
         public double MaxValue(double val1, double val2, double val3, double val4)
         {
             double ans = 0;
@@ -277,6 +353,15 @@ namespace MathLibrary
                 ans = val4;
             return ans;
         }
+        /// <summary>
+        /// 五數字取最大值
+        /// </summary>
+        /// <param name="val1"></param>
+        /// <param name="val2"></param>
+        /// <param name="val3"></param>
+        /// <param name="val4"></param>
+        /// <param name="val5"></param>
+        /// <returns></returns>
         public double MaxValue(double val1, double val2, double val3, double val4, double val5)
         {
             double ans = 0;
@@ -292,7 +377,11 @@ namespace MathLibrary
                 ans = val5;
             return ans;
         }
-
+        /// <summary>
+        /// 12小時轉24小時
+        /// </summary>
+        /// <param name="_hour"></param>
+        /// <returns></returns>
         public int Clock24h(int _hour)
         {
             int ans = _hour + 8;
@@ -300,21 +389,34 @@ namespace MathLibrary
                 ans = _hour - 24;
             return ans;
         }
-
+        /// <summary>
+        /// 1byte 10進制轉2進制
+        /// </summary>
+        /// <param name="Data"></param>
+        /// <returns></returns>
         public string work10to2(byte Data)
         {
             string bin = "00000000";
             bin = ("00000000" + Convert.ToString(Data, 2)).Right(8);
             return bin;
         }
-
+        /// <summary>
+        /// 2byte 10進制轉2進制
+        /// </summary>
+        /// <param name="DataH"></param>
+        /// <param name="DataL"></param>
+        /// <returns></returns>
         public string work10to2(byte DataH, byte DataL)
         {
             string bin = "0000000000000000";
             bin = ("00000000" + Convert.ToString(DataH, 2)).Right(8) + ("00000000" + Convert.ToString(DataL, 2)).Right(8);
             return bin;
         }
-
+        /// <summary>
+        /// 10進制字串轉2進制
+        /// </summary>
+        /// <param name="_val"></param>
+        /// <returns></returns>
         public string work10to2(string _val)
         {
             string bin = "00000000";
@@ -322,7 +424,13 @@ namespace MathLibrary
             bin = ("00000000" + Convert.ToString(ans, 2)).Right(8);
             return bin;
         }
-
+        /// <summary>
+        /// 多位元10進制轉2進制
+        /// </summary>
+        /// <param name="Data"></param>
+        /// <param name="startindex"></param>
+        /// <param name="dataLength"></param>
+        /// <returns></returns>
         public string work10to2(byte[] Data, int startindex, int dataLength)
         {
             string bin = "";
@@ -333,7 +441,11 @@ namespace MathLibrary
             }
             return bin;
         }
-
+        /// <summary>
+        /// 字串反轉
+        /// </summary>
+        /// <param name="_str"></param>
+        /// <returns></returns>
         public string StrReverse(string _str)
         {
             string str = _str;
@@ -342,7 +454,11 @@ namespace MathLibrary
             str = new string(ArrayStr);
             return str;
         }
-
+        /// <summary>
+        /// 數字星期轉文字
+        /// </summary>
+        /// <param name="WeekValue"></param>
+        /// <returns></returns>
         public string WeekValueToString(int WeekValue)
         {
             string ValueWeek = "";

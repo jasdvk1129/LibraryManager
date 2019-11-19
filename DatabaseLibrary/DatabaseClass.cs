@@ -1,733 +1,543 @@
-﻿using ErrorMessageLibrary;
-using System;
+﻿using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
-
+using Serilog;
+using System.ServiceProcess;
 
 namespace DatabaseLibrary
 {
     public class DatabaseClass
     {
-        public ErrorMessageClass ErrMsg;
-        public string ConnStr { get; set; } = "";
-        public string mSQLDatabase { get; set; } = "";
-        public bool mErrFlag { get; set; } = false;
-        private string mWorkPath;               //資料路徑
-        public string WorkPath
+        public DatabaseClass()
         {
-            get { return mWorkPath; }
-            set
-            {
-                if (WorkPath == "") value = Directory.GetCurrentDirectory();
-                mWorkPath = value;
-            }
+            Log.Logger = new LoggerConfiguration()
+                        .WriteTo.Console()
+                        .WriteTo.File($"{AppDomain.CurrentDomain.BaseDirectory}\\db_log\\log-.txt",
+                                      rollingInterval: RollingInterval.Day,
+                                      outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                        .CreateLogger();        //宣告Serilog初始化
         }
+        ///// <summary>
+        ///// SQL連接字串
+        ///// </summary>
+        //private SqlConnectionStringBuilder ConnStr = null;
         /// <summary>
-        /// Check log database exist.
+        /// 工作路徑
         /// </summary>
-        /// <param name="_time">System time</param>
-        /// <returns>Database is exist(true) or not(false)</returns>
-        public bool CheckDatabaseExistFunction(DateTime _time)
+        private readonly string WorkPath = AppDomain.CurrentDomain.BaseDirectory;
+        /// <summary>
+        /// 確認資料庫是否存在
+        /// </summary>
+        /// <param name="dBName">資料庫名稱</param>
+        /// <param name="ConnTxt">資料庫連線物件</param>
+        /// <returns>資料庫存在 (true),不存在(false)或異常(false)</returns>
+        public bool CheckDatabaseExistFunction(string dBName, SqlConnection ConnTxt)
         {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
             if (ConnTxt.State == ConnectionState.Closed)
                 ConnTxt.Open();
-            string SelectCheckDatabaseExist = "SELECT * FROM sys.databases WHERE name = '" + mSQLDatabase + "_" + _time.ToString("yyyy") + "'";
+            string SelectCheckDatabaseExist = $"SELECT * FROM sys.databases WHERE name = '{dBName}'";
+            bool dbExsit;
             try
             {
                 SqlCommand CmdCheckDatabaseExist = new SqlCommand(SelectCheckDatabaseExist, ConnTxt);
                 SqlDataReader CheckDatabaseExist = CmdCheckDatabaseExist.ExecuteReader();
                 if (!CheckDatabaseExist.HasRows)
-                    RecordFlog = false;         //資料庫不存在
+                    dbExsit = false;
                 else
-                    RecordFlog = true;          //資料庫存在
+                    dbExsit = true;
                 CheckDatabaseExist.Close();
             }
             catch (Exception ex)
             {
-                if (mErrFlag)
-                    ErrMsg._error(SelectCheckDatabaseExist, ex);
-                else
-                    ErrMsg._errorText(SelectCheckDatabaseExist, ex);
-                RecordFlog = false;
+                Log.Error(ex, SelectCheckDatabaseExist);
+                dbExsit = false;
             }
-            ConnTxt.Close();
-            return RecordFlog;
+            return dbExsit;
         }
-
-        public bool CheckDatabaseExistFunction(string _databasename)
+        /// <summary>
+        /// 確認資料庫是否存在
+        /// </summary>
+        /// <param name="dbName">資料庫名稱</param>
+        /// <param name="ConnStr">資料庫字串</param>
+        /// <returns>資料庫存在 (true),不存在(false)或異常(false)</returns>
+        public bool CheckDatabaseExistFunction(string dbName, SqlConnectionStringBuilder ConnStr)
         {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
+            SqlConnection ConnTxt = new SqlConnection();
+            ConnTxt.ConnectionString = ConnStr.ConnectionString;
             if (ConnTxt.State == ConnectionState.Closed)
                 ConnTxt.Open();
-            string SelectCheckDatabaseExist = "SELECT * FROM sys.databases WHERE name = '" + _databasename + "'";
+            string SelectCheckDatabaseExist = $"SELECT * FROM sys.databases WHERE name = '{dbName}'";
+            bool dbExsit;
             try
             {
                 SqlCommand CmdCheckDatabaseExist = new SqlCommand(SelectCheckDatabaseExist, ConnTxt);
                 SqlDataReader CheckDatabaseExist = CmdCheckDatabaseExist.ExecuteReader();
                 if (!CheckDatabaseExist.HasRows)
-                    RecordFlog = false;         //資料庫不存在
+                    dbExsit = false;
                 else
-                    RecordFlog = true;          //資料庫存在
+                    dbExsit = true;
                 CheckDatabaseExist.Close();
             }
             catch (Exception ex)
             {
-                if (mErrFlag)
-                    ErrMsg._error(SelectCheckDatabaseExist, ex);
-                else
-                    ErrMsg._errorText(SelectCheckDatabaseExist, ex);
-                RecordFlog = false;
+                Log.Error(ex, SelectCheckDatabaseExist);
+                dbExsit = false;
             }
             ConnTxt.Close();
-            return RecordFlog;
+            return dbExsit;
         }
         /// <summary>
-        /// Create log database.
+        /// 建立新的空資料庫
         /// </summary>
-        /// <param name="_time">System time</param>
-        /// <returns>Database create success(true) or not(false)</returns>
-        public bool CreateDatabaseFunction(DateTime _time)
+        /// <param name="dbName">資料庫名稱</param>
+        /// <param name="ConnStr">資料庫字串</param>
+        /// <returns>建立成功(true),失敗(false)</returns>
+        public bool CreateDatabaseFunction(string dbName, SqlConnectionStringBuilder ConnStr)
         {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
+            SqlConnection ConnTxt = new SqlConnection();
+            ConnTxt.ConnectionString = ConnStr.ConnectionString;
             if (ConnTxt.State == ConnectionState.Closed)
                 ConnTxt.Open();
-            string CreateDatabase = "CREATE DATABASE [" + mSQLDatabase + "_" + _time.ToString("yyyy") + "]";
+            string CreateDatabase = $"CREATE DATABASE [{dbName}]";
             try
             {
                 SqlCommand CmdDatabase = new SqlCommand(CreateDatabase, ConnTxt);
                 SqlDataReader Database = CmdDatabase.ExecuteReader();
                 Database.Close();
-                RecordFlog = true;
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(CreateDatabase, ex);
-                else
-                    ErrMsg._errorText(CreateDatabase, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-
-        public bool CreateDatabaseFunction(string _databasename)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string CreateDatabase = "CREATE DATABASE [" + _databasename + "]";
-            try
-            {
-                SqlCommand CmdDatabase = new SqlCommand(CreateDatabase, ConnTxt);
-                SqlDataReader Database = CmdDatabase.ExecuteReader();
-                Database.Close();
-                RecordFlog = true;
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(CreateDatabase, ex);
-                else
-                    ErrMsg._errorText(CreateDatabase, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-        /// <summary>
-        /// Check data table exist.
-        /// </summary>
-        /// <param name="_datatablename">Data table name</param>
-        /// <returns>Return data table exist(true) or not(false)</returns>
-        public bool CheckDataTableExistFunction(string _datatablename)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string SelectCheckDataTableExist = "SELECT COUNT(*) AS tcount FROM sysobjects WHERE name = '" + _datatablename + "'";
-            try
-            {
-                SqlCommand CmdCheckDataTableExist = new SqlCommand(SelectCheckDataTableExist, ConnTxt);
-                SqlDataReader CheckDataTableExist = CmdCheckDataTableExist.ExecuteReader();
-                if (CheckDataTableExist.HasRows)
-                    if (CheckDataTableExist.Read())
-                    {
-                        int mTableCount = Convert.ToInt32(CheckDataTableExist["tcount"]);
-                        if (mTableCount == 1)
-                            RecordFlog = true;          //資料表存在
-                        else
-                            RecordFlog = false;         //資料表不存在
-                    }
-                    else
-                    {
-                        RecordFlog = false;             //資料表不存在
-                    }
-                else
-                    RecordFlog = false;                 //資料表不存在
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(SelectCheckDataTableExist, ex);
-                else
-                    ErrMsg._errorText(SelectCheckDataTableExist, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-        /// <summary>
-        /// Check data table exist.
-        /// </summary>
-        /// <param name="_datatablename">Data table name</param>
-        /// <param name="_connstr">Database connect command</param>
-        /// <returns>Return data table exist(true) or not(false)</returns>
-        public bool CheckDataTableExistFunction(string _datatablename, string _connstr)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(_connstr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string SelectCheckDataTableExist = "SELECT COUNT(*) AS tcount FROM sysobjects WHERE name = '" + _datatablename + "'";
-            try
-            {
-                SqlCommand CmdCheckDataTableExist = new SqlCommand(SelectCheckDataTableExist, ConnTxt);
-                SqlDataReader CheckDataTableExist = CmdCheckDataTableExist.ExecuteReader();
-                if (CheckDataTableExist.HasRows)
-                    if (CheckDataTableExist.Read())
-                    {
-                        int mTableCount = Convert.ToInt32(CheckDataTableExist["tcount"]);
-                        if (mTableCount == 1)
-                            RecordFlog = true;          //資料表存在
-                        else
-                            RecordFlog = false;         //資料表不存在
-                    }
-                    else
-                    {
-                        RecordFlog = false;             //資料表不存在
-                    }
-                else
-                    RecordFlog = false;                 //資料表不存在
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(SelectCheckDataTableExist, ex);
-                else
-                    ErrMsg._errorText(SelectCheckDataTableExist, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-        /// <summary>
-        /// Create data table.
-        /// </summary>
-        /// <param name="_datatablename">Data table name</param>
-        /// <param name="_createcommand">Table create command</param>
-        /// <returns>Return create success(true) or not(false)</returns>
-        public bool CreateDataTableFunction(string _datatablename, string _createcommand)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string CreateDataTable = "CREATE TABLE [" + _datatablename + "](" + _createcommand + ")";
-            try
-            {
-                SqlCommand CmdDataTable = new SqlCommand(CreateDataTable, ConnTxt);
-                SqlDataReader DataTable = CmdDataTable.ExecuteReader();
-                DataTable.Close();
-                RecordFlog = false;
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(CreateDataTable, ex);
-                else
-                    ErrMsg._errorText(CreateDataTable, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-        /// <summary>
-        /// Create data table.
-        /// </summary>
-        /// <param name="_datatablename">Data table name</param>
-        /// <param name="_createcommand">Table create command</param>
-        /// <param name="_connstr">Database connect command</param>
-        /// <returns>Return create success(true) or not(false)</returns>
-        public bool CreateDataTableFunction(string _datatablename, string _createcommand, string _connstr)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(_connstr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string CreateDataTable = "CREATE TABLE [" + _datatablename + "](" + _createcommand + ")";
-            try
-            {
-                SqlCommand CmdDataTable = new SqlCommand(CreateDataTable, ConnTxt);
-                SqlDataReader DataTable = CmdDataTable.ExecuteReader();
-                DataTable.Close();
-                RecordFlog = false;
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(CreateDataTable, ex);
-                else
-                    ErrMsg._errorText(CreateDataTable, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-
-        public bool CheckDataLogExistFunction(string _tablename)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string SelectCheckDataLog = "SELECT * FROM " + _tablename;
-            try
-            {
-                SqlCommand CmdCheckDataLog = new SqlCommand(SelectCheckDataLog, ConnTxt);
-                SqlDataReader CheckDataLog = CmdCheckDataLog.ExecuteReader();
-                if (CheckDataLog.HasRows)
-                    RecordFlog = true;
-                else
-                    RecordFlog = false;
-                CheckDataLog.Close();
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(SelectCheckDataLog, ex);
-                else
-                    ErrMsg._errorText(SelectCheckDataLog, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-
-        public bool CheckDataLogExistFunction(string _tablename, string _condition)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string SelectCheckDataLog = "SELECT * FROM " + _tablename + " WHERE " + _condition;
-            try
-            {
-                SqlCommand CmdCheckDataLog = new SqlCommand(SelectCheckDataLog, ConnTxt);
-                SqlDataReader CheckDataLog = CmdCheckDataLog.ExecuteReader();
-                if (CheckDataLog.HasRows)
-                    RecordFlog = true;
-                else
-                    RecordFlog = false;
-                CheckDataLog.Close();
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(SelectCheckDataLog, ex);
-                else
-                    ErrMsg._errorText(SelectCheckDataLog, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-
-        public bool CheckDataLogExistFunction(string _tablename, string _condition, string _connstr)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(_connstr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string SelectCheckDataLog = "SELECT * FROM " + _tablename + " WHERE " + _condition;
-            try
-            {
-                SqlCommand CmdCheckDataLog = new SqlCommand(SelectCheckDataLog, ConnTxt);
-                SqlDataReader CheckDataLog = CmdCheckDataLog.ExecuteReader();
-                if (CheckDataLog.HasRows)
-                    RecordFlog = true;
-                else
-                    RecordFlog = false;
-                CheckDataLog.Close();
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(SelectCheckDataLog, ex);
-                else
-                    ErrMsg._errorText(SelectCheckDataLog, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-
-        public bool AddNewDataLogFunction(string _tablename, string _columns, string _data)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string InsertNewDataLog = "INSERT INTO " + _tablename + "(" + _columns + ") VALUES (" + _data + ")";
-            try
-            {
-                SqlCommand CmdNewDataLog = new SqlCommand(InsertNewDataLog, ConnTxt);
-                int NewDataLog = CmdNewDataLog.ExecuteNonQuery();
-                if (NewDataLog == 1)
-                    RecordFlog = true;
-                else
-                    RecordFlog = false;
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(InsertNewDataLog, ex);
-                else
-                    ErrMsg._errorText(InsertNewDataLog, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-
-        public bool AddNewDataLogFunction(string _tablename, string _columns, string _data, string _connstr)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(_connstr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string InsertNewDataLog = "INSERT INTO " + _tablename + "(" + _columns + ") VALUES (" + _data + ")";
-            try
-            {
-                SqlCommand CmdNewDataLog = new SqlCommand(InsertNewDataLog, ConnTxt);
-                int NewDataLog = CmdNewDataLog.ExecuteNonQuery();
-                if (NewDataLog == 1)
-                    RecordFlog = true;
-                else
-                    RecordFlog = false;
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(InsertNewDataLog, ex);
-                else
-                    ErrMsg._errorText(InsertNewDataLog, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-
-        public bool EditDataLogFunction(string _tablename, string _command, string _condition)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string UpdateEditDataLog = "UPDATE [" + _tablename + "] SET " + _command + " WHERE " + _condition;
-            try
-            {
-                SqlCommand CmdEditDataLog = new SqlCommand(UpdateEditDataLog, ConnTxt);
-                int EditDataLog = CmdEditDataLog.ExecuteNonQuery();
-                if (EditDataLog == 1)
-                    RecordFlog = true;
-                else
-                    RecordFlog = false;
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(UpdateEditDataLog, ex);
-                else
-                    ErrMsg._errorText(UpdateEditDataLog, ex);
-                RecordFlog = false;
-            }
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-        /// <summary>
-        /// 修改資料函式
-        /// </summary>
-        /// <param name="_tablename"></param>
-        /// <param name="_command"></param>
-        /// <returns></returns>
-        public bool EditDataLogFunction(string _tablename, string _command)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string UpdateEditDataLog = "UPDATE [" + _tablename + "] SET " + _command;
-            try
-            {
-                SqlCommand CmdEditDataLog = new SqlCommand(UpdateEditDataLog, ConnTxt);
-                int EditDataLog = CmdEditDataLog.ExecuteNonQuery();
-                if (EditDataLog == 1)
-                    RecordFlog = true;
-                else
-                    RecordFlog = false;
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(UpdateEditDataLog, ex);
-                else
-                    ErrMsg._errorText(UpdateEditDataLog, ex);
-                RecordFlog = false;
-            }
-
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-        /// <summary>
-        /// 修改資料函式
-        /// </summary>
-        /// <param name="_tablename"></param>
-        /// <param name="_command"></param>
-        /// <param name="_condition"></param>
-        /// <param name="_connstr"></param>
-        /// <returns></returns>
-        public bool EditDataLogFunction(string _tablename, string _command, string _condition, string _connstr)
-        {
-            bool RecordFlog = false;
-            SqlConnection ConnTxt = new SqlConnection(_connstr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string UpdateEditDataLog = "UPDATE [" + _tablename + "] SET " + _command + " WHERE " + _condition;
-            try
-            {
-                SqlCommand CmdEditDataLog = new SqlCommand(UpdateEditDataLog, ConnTxt);
-                int EditDataLog = CmdEditDataLog.ExecuteNonQuery();
-                if (EditDataLog == 1)
-                    RecordFlog = true;
-                else
-                    RecordFlog = false;
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(UpdateEditDataLog, ex);
-                else
-                    ErrMsg._errorText(UpdateEditDataLog, ex);
-                RecordFlog = false;
-            }
-
-            ConnTxt.Close();
-            return RecordFlog;
-        }
-        /// <summary>
-        /// 取得總資料筆數函式
-        /// </summary>
-        /// <param name="_tablename">資料表名稱</param>
-        /// <param name="_condition">過濾條件</param>
-        /// <returns>資料筆數</returns>
-        public int GetDataAmountFunction(string _tablename, string _condition)
-        {
-            int mAmount = 0;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string SelectDataAmount = "SELECT COUNT(*) AS amount FROM " + _tablename + " WHERE " + _condition;
-            try
-            {
-                SqlCommand CmdDataAmount = new SqlCommand(SelectDataAmount, ConnTxt);
-                SqlDataReader DataAmount = CmdDataAmount.ExecuteReader();
-                if (DataAmount.HasRows)
-                {
-                    if (DataAmount.Read())
-                    {
-                        mAmount = Convert.ToInt32(DataAmount["amount"]);
-                    }
-                }
-                DataAmount.Close();
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(SelectDataAmount, ex);
-                else
-                    ErrMsg._errorText(SelectDataAmount, ex);
-            }
-            ConnTxt.Close();
-            return mAmount;
-        }
-        /// <summary>
-        /// 取得總資料筆數函式
-        /// </summary>
-        /// <param name="_tablename">資料表名稱</param>
-        /// <param name="_condition">過濾條件</param>
-        /// <param name="_connstr">資料庫連接字串</param>
-        /// <returns>資料筆數</returns>
-        public int GetDataAmountFunction(string _tablename, string _condition, string _connstr)
-        {
-            int mAmount = 0;
-            SqlConnection ConnTxt = new SqlConnection(_connstr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string SelectDataAmount = "SELECT COUNT(*) AS amount FROM " + _tablename + " WHERE " + _condition;
-            try
-            {
-                SqlCommand CmdDataAmount = new SqlCommand(SelectDataAmount, ConnTxt);
-                SqlDataReader DataAmount = CmdDataAmount.ExecuteReader();
-                if (DataAmount.HasRows)
-                {
-                    if (DataAmount.Read())
-                    {
-                        mAmount = Convert.ToInt32(DataAmount["amount"]);
-                    }
-                }
-                DataAmount.Close();
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(SelectDataAmount, ex);
-                else
-                    ErrMsg._errorText(SelectDataAmount, ex);
-            }
-            ConnTxt.Close();
-            return mAmount;
-        }
-        /// <summary>
-        /// 取得總資料筆數函式(使用預設字串)
-        /// </summary>
-        /// <param name="_tablename">資料表名稱</param>
-        /// <returns>資料筆數</returns>
-        public int GetTotalDataAmountFunction(string _tablename)
-        {
-            int mAmount = 0;
-            SqlConnection ConnTxt = new SqlConnection(ConnStr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string SelectDataAmount = "SELECT COUNT(*) AS amount FROM " + _tablename;
-            try
-            {
-                SqlCommand CmdDataAmount = new SqlCommand(SelectDataAmount, ConnTxt);
-                SqlDataReader DataAmount = CmdDataAmount.ExecuteReader();
-                if (DataAmount.HasRows)
-                {
-                    if (DataAmount.Read())
-                    {
-                        mAmount = Convert.ToInt32(DataAmount["amount"]);
-                    }
-                }
-                DataAmount.Close();
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(SelectDataAmount, ex);
-                else
-                    ErrMsg._errorText(SelectDataAmount, ex);
-            }
-            ConnTxt.Close();
-            return mAmount;
-        }
-        /// <summary>
-        /// 取得總資料筆數函式
-        /// </summary>
-        /// <param name="_tablename">資料表名稱</param>
-        /// <param name="_connstr">資料庫連接字串</param>
-        /// <returns>資料筆數</returns>
-        public int GetTotalDataAmountFunction(string _tablename, string _connstr)
-        {
-            int mAmount = 0;
-            SqlConnection ConnTxt = new SqlConnection(_connstr);
-            if (ConnTxt.State == ConnectionState.Closed)
-                ConnTxt.Open();
-            string SelectDataAmount = "SELECT COUNT(*) AS amount FROM " + _tablename;
-            try
-            {
-                SqlCommand CmdDataAmount = new SqlCommand(SelectDataAmount, ConnTxt);
-                SqlDataReader DataAmount = CmdDataAmount.ExecuteReader();
-                if (DataAmount.HasRows)
-                {
-                    if (DataAmount.Read())
-                    {
-                        mAmount = Convert.ToInt32(DataAmount["amount"]);
-                    }
-                }
-                DataAmount.Close();
-            }
-            catch (Exception ex)
-            {
-                if (mErrFlag)
-                    ErrMsg._error(SelectDataAmount, ex);
-                else
-                    ErrMsg._errorText(SelectDataAmount, ex);
-            }
-            ConnTxt.Close();
-            return mAmount;
-        }
-        /// <summary>
-        /// 告警資訊歷史訊息清單
-        /// </summary>
-        /// <param name="nowTime">現在時間</param>
-        /// <param name="GID">Gateway編號</param>
-        /// <param name="DeviceIndex">設備編號</param>
-        /// <param name="MessageText">告警訊息</param>
-        /// <param name="ConnStrLog">資料庫連接字串</param>
-        /// <returns></returns>
-        public bool AlarmInfomationLogger(DateTime nowTime, int GID, int DeviceIndex, string MessageText, string ConnStrLog)
-        {
-            if (CheckDatabaseExistFunction(nowTime))
-            {
-                if (!CheckDataTableExistFunction("Alarm_Log", ConnStrLog))
-                {
-                    CreateDataTableFunction("Alarm_Log", "AlarmID INT IDENTITY PRIMARY KEY,ttime VARCHAR(14) DEFAULT '',ttimen DATETIME,GID INT DEFAULT 0,DeviceIndex INT DEFAULT 0,MessageText NVARCHAR(100) DEFAULT '',SendFlag INT DEFAULT 0", ConnStrLog);
-                }
-                SqlConnection ConnTxt = new SqlConnection(ConnStrLog);
-                if (ConnTxt.State == ConnectionState.Closed)
-                    ConnTxt.Open();
-                string SelectCheckAlarm = $"SELECT * FROM Alarm_Log WHERE MessageText = '{MessageText}'";
-                try
-                {
-                    SqlCommand CmdCheckAlarm = new SqlCommand(SelectCheckAlarm, ConnTxt);
-                    SqlDataReader CheckAlarm = CmdCheckAlarm.ExecuteReader();
-                    if (!CheckAlarm.HasRows)
-                    {
-                        CheckAlarm.Close();
-                        string InsertNewAlarmData = $"INSERT INTO Alarm_Log(ttime,ttimen,GID,DeviceIndex,MessageText) VALUES ('{nowTime.ToString("yyyyMMddHHmmss")}','{nowTime.ToString("yyyy/MM/dd HH:mm:ss")}',{GID},{DeviceIndex},'{MessageText}')";
-                        try
-                        {
-                            SqlCommand CmdNewAlarmData = new SqlCommand(InsertNewAlarmData, ConnTxt);
-                            int NewAlarmData = CmdNewAlarmData.ExecuteNonQuery();
-                            if (NewAlarmData > 0)
-                            {
-                                ConnTxt.Close();
-                                return true;
-                            }
-                        }
-                        catch (Exception ex)
-                        { ErrMsg._errorText(InsertNewAlarmData, ex); }
-                    }
-                    else
-                    {
-                        CheckAlarm.Close();
-                    }
-                }
-                catch (Exception ex)
-                { ErrMsg._errorText(SelectCheckAlarm, ex); }
                 ConnTxt.Close();
+                return true;
             }
-            return false;
+            catch (Exception ex)
+            {
+                Log.Error(ex, CreateDatabase);
+                ConnTxt.Close();
+                return false;
+            }
         }
+        /// <summary>
+        /// 建立新的空資料庫
+        /// </summary>
+        /// <param name="dbName">資料庫名稱</param>
+        /// <param name="ConnTxt">資料庫字串</param>
+        /// <returns>建立成功(true),失敗(false)</returns>
+        public bool CreateDatabaseFunction(string dbName, SqlConnection ConnTxt)
+        {
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string CreateDatabase = $"CREATE DATABASE [{dbName}]";
+            try
+            {
+                SqlCommand CmdDatabase = new SqlCommand(CreateDatabase, ConnTxt);
+                SqlDataReader Database = CmdDatabase.ExecuteReader();
+                Database.Close();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, CreateDatabase);
+                return false;
+            }
+        }
+        /// <summary>
+        /// 確認資料表是否存在
+        /// </summary>
+        /// <param name="dtName">資料表名稱</param>
+        /// <param name="ConnStr">資料庫連接字串</param>
+        /// <returns>資料表存在(true),不存在(false)或檢查時發生異常(false)</returns>
+        public bool CheckDataTableExistFunction(string dtName, SqlConnectionStringBuilder ConnStr)
+        {
+            SqlConnection ConnTxt = new SqlConnection();
+            ConnTxt.ConnectionString = ConnStr.ConnectionString;
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string SelectCheckDataTableExist = $"SELECT o.name, i.rows FROM sysobjects o INNER JOIN sysindexes i ON o.id = i.id WHERE i.indid = 1 AND o.name = '{dtName}' ORDER BY i.rows DESC";
+            bool RecordFlog;
+            try
+            {
+                SqlCommand CmdCheckDataTableExist = new SqlCommand(SelectCheckDataTableExist, ConnTxt);
+                SqlDataReader CheckDataTableExist = CmdCheckDataTableExist.ExecuteReader();
+                if (CheckDataTableExist.HasRows)
+                    RecordFlog = true;
+                else
+                    RecordFlog = false;                 //資料表不存在
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, SelectCheckDataTableExist);
+                RecordFlog = false;
+            }
+            ConnTxt.Close();
+            return RecordFlog;
+        }
+        /// <summary>
+        /// 確認資料表是否存在
+        /// </summary>
+        /// <param name="dtName">資料表名稱</param>
+        /// <param name="ConnTxt">外部共用資料庫連結</param>
+        /// <returns>資料表存在(true),不存在(false)或檢查時發生異常(false)</returns>
+        public bool CheckDataTableExistFunction(string dtName, SqlConnection ConnTxt)
+        {
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string SelectCheckDataTableExist = $"SELECT o.name, i.rows FROM sysobjects o INNER JOIN sysindexes i ON o.id = i.id WHERE i.indid = 1 AND o.name = '{dtName}' ORDER BY i.rows DESC";
+            bool RecordFlog;
+            try
+            {
+                SqlCommand CmdCheckDataTableExist = new SqlCommand(SelectCheckDataTableExist, ConnTxt);
+                SqlDataReader CheckDataTableExist = CmdCheckDataTableExist.ExecuteReader();
+                if (CheckDataTableExist.HasRows)
+                    RecordFlog = true;
+                else
+                    RecordFlog = false;                 //資料表不存在
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, SelectCheckDataTableExist);
+                RecordFlog = false;
+            }
+            return RecordFlog;
+        }
+        /// <summary>
+        /// 建立資料表
+        /// </summary>
+        /// <param name="dtName">資料表名稱</param>
+        /// <param name="CreateCommand">建立命令</param>
+        /// <param name="ConnTxt">外部資料庫連接物件</param>
+        /// <returns>Return create success(true) or not(false)</returns>
+        public bool CreateDataTableFunction(string dtName, string CreateCommand, SqlConnection ConnTxt)
+        {
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string CreateDataTable = $"CREATE TABLE [{dtName}]({CreateCommand})";
+            bool RecordFlog;
+            try
+            {
+                SqlCommand CmdDataTable = new SqlCommand(CreateDataTable, ConnTxt);
+                SqlDataReader DataTable = CmdDataTable.ExecuteReader();
+                DataTable.Close();
+                RecordFlog = false;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, CreateDataTable);
+                RecordFlog = false;
+            }
+            ConnTxt.Close();
+            return RecordFlog;
+        }
+        /// <summary>
+        /// 建立資料表
+        /// </summary>
+        /// <param name="dtName">資料表名稱</param>
+        /// <param name="CreateCommand">建立命令</param>
+        /// <param name="ConnStr">資料庫連接設定</param>
+        /// <returns>Return create success(true) or not(false)</returns>
+        public bool CreateDataTableFunction(string dtName, string CreateCommand, SqlConnectionStringBuilder ConnStr)
+        {
+            SqlConnection ConnTxt = new SqlConnection();
+            ConnTxt.ConnectionString = ConnStr.ConnectionString;
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string CreateDataTable = $"CREATE TABLE [{dtName}]({CreateCommand})";
+            bool RecordFlog;
+            try
+            {
+                SqlCommand CmdDataTable = new SqlCommand(CreateDataTable, ConnTxt);
+                SqlDataReader DataTable = CmdDataTable.ExecuteReader();
+                DataTable.Close();
+                RecordFlog = false;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, CreateDataTable);
+                RecordFlog = false;
+            }
+            ConnTxt.Close();
+            return RecordFlog;
+        }
+        /// <summary>
+        /// 確認該筆資料是否存在
+        /// </summary>
+        /// <param name="dtName">資料表名稱</param>
+        /// <param name="Condition">過濾條件SQL命令</param>
+        /// <param name="ConnStr">資料庫連接設定</param>
+        /// <returns></returns>
+        public bool CheckDataLogExistFunction(string dtName, string Condition, SqlConnectionStringBuilder ConnStr)
+        {
+            SqlConnection ConnTxt = new SqlConnection();
+            ConnTxt.ConnectionString = ConnStr.ConnectionString;
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string SelectCheckDataLog = $"SELECT * FROM {dtName} WHERE {Condition}";
+            bool RecordFlog;
+            try
+            {
+                SqlCommand CmdCheckDataLog = new SqlCommand(SelectCheckDataLog, ConnTxt);
+                SqlDataReader CheckDataLog = CmdCheckDataLog.ExecuteReader();
+                if (CheckDataLog.HasRows)
+                    RecordFlog = true;
+                else
+                    RecordFlog = false;
+                CheckDataLog.Close();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, SelectCheckDataLog);
+                RecordFlog = false;
+            }
+            ConnTxt.Close();
+            return RecordFlog;
+        }
+        /// <summary>
+        /// 確認該筆資料是否存在
+        /// </summary>
+        /// <param name="dtName">資料表名稱</param>
+        /// <param name="Condition">過濾條件SQL命令</param>
+        /// <param name="ConnTxt">資料庫連接物件</param>
+        /// <returns></returns>
+        public bool CheckDataLogExistFunction(string dtName, string Condition, SqlConnection ConnTxt)
+        {
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string SelectCheckDataLog = $"SELECT * FROM {dtName} WHERE {Condition}";
+            bool RecordFlog;
+            try
+            {
+                SqlCommand CmdCheckDataLog = new SqlCommand(SelectCheckDataLog, ConnTxt);
+                SqlDataReader CheckDataLog = CmdCheckDataLog.ExecuteReader();
+                if (CheckDataLog.HasRows)
+                    RecordFlog = true;
+                else
+                    RecordFlog = false;
+                CheckDataLog.Close();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, SelectCheckDataLog);
+                RecordFlog = false;
+            }
+            ConnTxt.Close();
+            return RecordFlog;
+        }
+        /// <summary>
+        /// 新增資料
+        /// </summary>
+        /// <param name="dtName">資料表名稱</param>
+        /// <param name="dtColumns">資料欄位</param>
+        /// <param name="newData">資料</param>
+        /// <param name="ConnStr">資料庫連接設定</param>
+        /// <returns></returns>
+        public bool AddNewDataLogFunction(string dtName, string dtColumns, string newData, SqlConnectionStringBuilder ConnStr)
+        {
+            SqlConnection ConnTxt = new SqlConnection();
+            ConnTxt.ConnectionString = ConnStr.ConnectionString;
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string InsertNewDataLog = $"INSERT INTO {dtName}({dtColumns}) VALUES ({newData})";
+            bool RecordFlog;
+            try
+            {
+                SqlCommand CmdNewDataLog = new SqlCommand(InsertNewDataLog, ConnTxt);
+                int NewDataLog = CmdNewDataLog.ExecuteNonQuery();
+                if (NewDataLog == 1)
+                    RecordFlog = true;
+                else
+                    RecordFlog = false;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, InsertNewDataLog);
+                RecordFlog = false;
+            }
+            ConnTxt.Close();
+            return RecordFlog;
+        }
+        /// <summary>
+        /// 新增資料
+        /// </summary>
+        /// <param name="dtName">資料表名稱</param>
+        /// <param name="dtColumns">資料欄位</param>
+        /// <param name="newData">資料</param>
+        /// <param name="ConnTxt">資料庫連接物件</param>
+        /// <returns></returns>
+        public bool AddNewDataLogFunction(string dtName, string dtColumns, string newData, SqlConnection ConnTxt)
+        {
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string InsertNewDataLog = $"INSERT INTO {dtName}({dtColumns}) VALUES ({newData})";
+            bool RecordFlog;
+            try
+            {
+                SqlCommand CmdNewDataLog = new SqlCommand(InsertNewDataLog, ConnTxt);
+                int NewDataLog = CmdNewDataLog.ExecuteNonQuery();
+                if (NewDataLog == 1)
+                    RecordFlog = true;
+                else
+                    RecordFlog = false;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, InsertNewDataLog);
+                RecordFlog = false;
+            }
+            ConnTxt.Close();
+            return RecordFlog;
+        }
+        /// <summary>
+        /// 取得總資料筆數函式
+        /// </summary>
+        /// <param name="dtName">資料表名稱</param>
+        /// <param name="Condition">過濾條件</param>
+        /// <param name="ConnStr">資料庫連接設定</param>
+        /// <returns>資料筆數</returns>
+        public int GetTotalDataAmountFunction(string dtName, SqlConnectionStringBuilder ConnStr)
+        {
+            SqlConnection ConnTxt = new SqlConnection();
+            ConnTxt.ConnectionString = ConnStr.ConnectionString;
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string SelectDataAmount = $"SELECT o.name, i.rows FROM sysobjects o INNER JOIN sysindexes i ON o.id = i.id WHERE i.indid = 1 AND o.name = '{dtName}' ORDER BY i.rows DESC";
+            int Amount = 0;
+            try
+            {
+                SqlCommand CmdDataAmount = new SqlCommand(SelectDataAmount, ConnTxt);
+                SqlDataReader DataAmount = CmdDataAmount.ExecuteReader();
+                if (DataAmount.HasRows)
+                {
+                    if (DataAmount.Read())
+                    {
+                        Amount = Convert.ToInt32(DataAmount["rows"]);
+                    }
+                }
+                DataAmount.Close();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, SelectDataAmount);
+            }
+            ConnTxt.Close();
+            return Amount;
+        }
+        /// <summary>
+        /// 取得總資料筆數函式
+        /// </summary>
+        /// <param name="_tablename">資料表名稱</param>
+        /// <param name="_condition">過濾條件</param>
+        /// <param name="_connstr">資料庫連接字串</param>
+        /// <returns>資料筆數</returns>
+        public int GetTotalDataAmountFunction(string dtName, SqlConnection ConnTxt)
+        {
+            if (ConnTxt.State == ConnectionState.Closed)
+                ConnTxt.Open();
+            string SelectDataAmount = $"SELECT o.name, i.rows FROM sysobjects o INNER JOIN sysindexes i ON o.id = i.id WHERE i.indid = 1 AND o.name = '{dtName}' ORDER BY i.rows DESC";
+            int Amount = 0;
+            try
+            {
+                SqlCommand CmdDataAmount = new SqlCommand(SelectDataAmount, ConnTxt);
+                SqlDataReader DataAmount = CmdDataAmount.ExecuteReader();
+                if (DataAmount.HasRows)
+                {
+                    if (DataAmount.Read())
+                    {
+                        Amount = Convert.ToInt32(DataAmount["rows"]);
+                    }
+                }
+                DataAmount.Close();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, SelectDataAmount);
+            }
+            ConnTxt.Close();
+            return Amount;
+        }
+        /// <summary>
+        /// 重啟SQLserver服務
+        /// 請開啟最高權限使用，點選專案屬性→安全性（勾選"啟用ClickOnce安全設置"），在項目名稱裡的"Properties"下面一個"app.manifest"
+        /// 找尋 level="asInvoker" uiAccess="false"改為 level="requireAdministrator" uiAccess="false" 
+        /// 再(取消勾選"啟用ClickOnce安全設置")，重新建置專案
+        /// </summary>
+        public void SQLserverReStart(string SQLServiceName = "MSSQLSERVER")
+        {
+            ServiceController controller = new ServiceController();
+            try
+            {
+                controller.MachineName = Environment.MachineName;
+                controller.ServiceName = SQLServiceName;
+                controller.Stop();
+                controller.WaitForStatus(ServiceControllerStatus.Stopped);
+                controller.Start();
+                controller.WaitForStatus(ServiceControllerStatus.Running);
+            }
+            catch (ArgumentNullException ex)
+            {
+                Log.Error("服務名稱請勿輸入NULL", ex);
+            }
+            catch (ArgumentException ex)
+            {
+                Log.Error("確認服務名稱是否正確", ex);
+            }
+            catch (InvalidOperationException ex)
+            {
+                Log.Error("使用者權限錯誤程式請以最高權限執行", ex);
+            }
+        }
+        ///// <summary>
+        ///// 告警資訊歷史訊息清單
+        ///// </summary>
+        ///// <param name="nowTime">現在時間</param>
+        ///// <param name="GID">Gateway編號</param>
+        ///// <param name="DeviceIndex">設備編號</param>
+        ///// <param name="MessageText">告警訊息</param>
+        ///// <param name="ConnStrLog">資料庫連接字串</param>
+        ///// <returns></returns>
+        //public bool AlarmInfomationLogger(DateTime nowTime, int GID, int DeviceIndex, string MessageText, string ConnStrLog)
+        //{
+        //    if (CheckDatabaseExistFunction(nowTime))
+        //    {
+        //        if (!CheckDataTableExistFunction("Alarm_Log", ConnStrLog))
+        //        {
+        //            CreateDataTableFunction("Alarm_Log", "AlarmID INT IDENTITY PRIMARY KEY,ttime VARCHAR(14) DEFAULT '',ttimen DATETIME,GID INT DEFAULT 0,DeviceIndex INT DEFAULT 0,MessageText NVARCHAR(100) DEFAULT '',SendFlag INT DEFAULT 0", ConnStrLog);
+        //        }
+        //        SqlConnection ConnTxt = new SqlConnection(ConnStrLog);
+        //        if (ConnTxt.State == ConnectionState.Closed)
+        //            ConnTxt.Open();
+        //        string SelectCheckAlarm = $"SELECT * FROM Alarm_Log WHERE MessageText = '{MessageText}'";
+        //        try
+        //        {
+        //            SqlCommand CmdCheckAlarm = new SqlCommand(SelectCheckAlarm, ConnTxt);
+        //            SqlDataReader CheckAlarm = CmdCheckAlarm.ExecuteReader();
+        //            if (!CheckAlarm.HasRows)
+        //            {
+        //                CheckAlarm.Close();
+        //                string InsertNewAlarmData = $"INSERT INTO Alarm_Log(ttime,ttimen,GID,DeviceIndex,MessageText) VALUES ('{nowTime.ToString("yyyyMMddHHmmss")}','{nowTime.ToString("yyyy/MM/dd HH:mm:ss")}',{GID},{DeviceIndex},'{MessageText}')";
+        //                try
+        //                {
+        //                    SqlCommand CmdNewAlarmData = new SqlCommand(InsertNewAlarmData, ConnTxt);
+        //                    int NewAlarmData = CmdNewAlarmData.ExecuteNonQuery();
+        //                    if (NewAlarmData > 0)
+        //                    {
+        //                        ConnTxt.Close();
+        //                        return true;
+        //                    }
+        //                }
+        //                catch (Exception ex)
+        //                {
+
+        //                }
+        //            }
+        //            else
+        //            {
+        //                CheckAlarm.Close();
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+
+        //        }
+        //        ConnTxt.Close();
+        //    }
+        //    return false;
+        //}
     }
 }

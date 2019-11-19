@@ -11,6 +11,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using static NetworkCommsDotNet.Tools.StreamTools;
+using ErrorMessageLibrary;
+
 
 
 namespace TCPClientServerLibrary

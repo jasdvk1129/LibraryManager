@@ -37,26 +37,5 @@ namespace SQLSwitchLibrary
             catch (ArgumentException ex) { _errorHide("確認服務名稱是否正確", ex); }
             catch (InvalidOperationException ex) { _errorHide("使用者權限錯誤程式請以最高權限執行", ex); }
         }
-        private object _thislock = new object();
-        private void _errorHide(string errormessage, Exception ex)
-        {
-            lock (_thislock)
-            {
-                DateTime path = DateTime.Now;
-                if (Directory.Exists(WorkPath + "\\error\\" + path.ToString("yyyyMM")) == false)
-                    Directory.CreateDirectory(WorkPath + "\\error\\" + path.ToString("yyyyMM"));
-                string filename = WorkPath + "\\error\\" + path.ToString("yyyyMM") + "\\" + path.ToString("yyyyMMddHHmm") + ".err";
-                StreamWriter errfile = new StreamWriter(filename, true, Encoding.Default);
-                errfile.WriteLine(Directory.GetCurrentDirectory());
-                errfile.WriteLine("時間:" + path.ToString("yyyy/MM/dd HH:mm:ss"));
-                errfile.WriteLine(errormessage);
-                errfile.WriteLine("ex.ToString = " + ex.ToString());
-                errfile.WriteLine("ex.Message = " + ex.Message);
-                errfile.WriteLine("ex.StackTrace = " + ex.StackTrace);
-                errfile.WriteLine("***********************************************************************************************");
-                errfile.WriteLine();
-                errfile.Close();
-            }
-        }
     }
 }
