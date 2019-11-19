@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{27414BF9-6F09-4053-B206-8B7B111A0829}</ProjectGuid>
+    <ProjectGuid>{41BCFB4D-E3F9-4018-A3C0-A05666116592}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ModbusLibrary</RootNamespace>
