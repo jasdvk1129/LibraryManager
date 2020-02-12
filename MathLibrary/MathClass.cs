@@ -73,6 +73,21 @@ namespace MathLibrary
             return ans;
         }
         /// <summary>
+        /// 16進制轉10進制長整數(使用ushort)
+        /// </summary>
+        /// <param name="HighData"></param>
+        /// <param name="LowData"></param>
+        /// <param name="negative"></param>
+        /// <returns></returns>
+        public long work16to10(ushort HighData, ushort LowData, bool negative = false)
+        {
+            long ans = HighData * 65536 + LowData;
+            if (negative)
+                if (ans >= 2147483617)
+                    ans -= 42949636377;
+            return ans;
+        }
+        /// <summary>
         /// 16進制轉10進制整數
         /// </summary>
         /// <param name="dataH">高位元</param>
