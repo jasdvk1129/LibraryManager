@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -14,19 +15,19 @@ namespace UpToIewatchLibrary
         /// <summary>
         /// UDP上傳指定 Port 4660
         /// </summary>
-        UdpClient myUdpClient = new UdpClient(4660);
+        UdpClient myUdpClient = null;
         /// <summary>
-        /// AI 初始化
+        /// 
         /// </summary>
-        public int[] aizer { get; set; } = new int[16];
-        /// <summary>
-        /// DI 初始化
-        /// </summary>
-        public byte[] dizer { get; set; } = new byte[8];
-        /// <summary>
-        /// 電表資訊 初始化
-        /// </summary>
-        public float[] outbytezer { get; set; } = new float[14];
+        /// <param name="UdpPort">Udp通訊埠</param>
+        public UpToIewatchClass(int UdpPort = 4660)
+        {
+            Log.Logger = new LoggerConfiguration()
+                        .WriteTo.Console()
+                        .WriteTo.File("log/x200logs/log-.txt", outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] {Message}{NewLine}{Exception}")
+                        .CreateLogger();
+            myUdpClient = new UdpClient(UdpPort);
+        }
         private CRC16 crc16 = new CRC16();
         #region 上傳平台
         /// <summary>
@@ -34,8 +35,8 @@ namespace UpToIewatchLibrary
         /// </summary>
         /// <param name="tcardno">卡號</param>
         /// <param name="tboardno">版號</param>
-        /// <param name="ai1out">AI數值</param>
-        /// <param name="diout">DI數值</param>
+        /// <param name="AI">AI數值</param>
+        /// <param name="DI">DI數值</param>
         /// <param name="outbyte">點表數值  
         /// <para>陣列[0]~[2] 電壓</para>
         /// <para>陣列[3]~[5] 電流</para>
@@ -45,7 +46,7 @@ namespace UpToIewatchLibrary
         /// </param>
         /// <param name="serverip">上傳IP</param>
         /// <param name="serverport">上傳Port號</param>
-        public void scan_adioco(string tcardno, string tboardno, int[] ai1out, byte[] diout,
+        public void scan_adioco(string tcardno, string tboardno, int[] AI, byte[] DI, byte[] DO,
                                 float rv, float sv, float tv,
                                 float ra, float sa, float ta,
                                 float kw, float kwh, float pfe,
@@ -80,32 +81,32 @@ namespace UpToIewatchLibrary
                 sendstringbyet[18] = asci[0];
                 sendstringbyet[19] = asci[1];
                 sendstringbyet[20] = 1;
-                byte[] ai1byte = BitConverter.GetBytes(ai1out[0]);
+                byte[] ai1byte = BitConverter.GetBytes(AI[0]);
                 sendstringbyet[21] = ai1byte[1];
                 sendstringbyet[22] = ai1byte[0];
-                byte[] ai2byte = BitConverter.GetBytes(ai1out[1]);
+                byte[] ai2byte = BitConverter.GetBytes(AI[1]);
                 sendstringbyet[23] = ai2byte[1];
                 sendstringbyet[24] = ai2byte[0];
-                byte[] ai3byte = BitConverter.GetBytes(ai1out[2]);
+                byte[] ai3byte = BitConverter.GetBytes(AI[2]);
                 sendstringbyet[25] = ai3byte[1];
                 sendstringbyet[26] = ai3byte[0];
-                byte[] ai4byte = BitConverter.GetBytes(ai1out[3]);
+                byte[] ai4byte = BitConverter.GetBytes(AI[3]);
                 sendstringbyet[27] = ai4byte[1];
                 sendstringbyet[28] = ai4byte[0];
-                byte[] ai5byte = BitConverter.GetBytes(ai1out[4]);
+                byte[] ai5byte = BitConverter.GetBytes(AI[4]);
                 sendstringbyet[29] = ai5byte[1];
                 sendstringbyet[30] = ai5byte[0];
-                byte[] ai6byte = BitConverter.GetBytes(ai1out[5]);
+                byte[] ai6byte = BitConverter.GetBytes(AI[5]);
                 sendstringbyet[31] = ai6byte[1];
                 sendstringbyet[32] = ai6byte[0];
-                byte[] ai7byte = BitConverter.GetBytes(ai1out[6]);
+                byte[] ai7byte = BitConverter.GetBytes(AI[6]);
                 sendstringbyet[33] = ai7byte[1];
                 sendstringbyet[34] = ai7byte[0];
-                byte[] ai8byte = BitConverter.GetBytes(ai1out[7]);
+                byte[] ai8byte = BitConverter.GetBytes(AI[7]);
                 sendstringbyet[35] = ai8byte[1];
                 sendstringbyet[36] = ai8byte[0];
-                sendstringbyet[37] = diout[0];     // di;
-                sendstringbyet[38] = dizer[0];     // do
+                sendstringbyet[37] = work2to10(DI);     // di;
+                sendstringbyet[38] = work2to10(DO);     // do
                 sendstringbyet[39] = 0;
                 sendstringbyet[40] = 0;
                 sendstringbyet[41] = 0;
@@ -196,12 +197,25 @@ namespace UpToIewatchLibrary
             { Console.WriteLine(ex); }
         }
         #endregion
+        /// <summary>
+        /// 2進制轉10進制
+        /// </summary>
+        /// <param name="state">狀態陣列</param>
+        /// <returns></returns>
+        private byte work2to10(byte[] state)
+        {
+            string str = "";
+            foreach (var item in state)
+            {
+                str += item;
+            }
+            byte ans = Convert.ToByte(str, 2);
+            return ans;
+        }
     }
 }
-public class CRC16
+class CRC16
 {
-    public UdpClient myUdpClient = new UdpClient();
-    byte[] dizer = new byte[2];
     public void stringtobyte(String value1, int kind, out byte ou)
     {
         ou = 0;
@@ -276,22 +290,4 @@ public class CRC16
         ReturnData[1] = CRC16Lo;      //'CRC低位
         return ReturnData;
     }
-    public float ex(Byte in1, Byte in2)
-    {
-        float outv;
-        outv = in1 * 256 + in2;
-        return outv;
-    }
-    public Single work754to10(byte val1, byte val2, byte val3, byte val4)
-    {
-        Single ans = 0;
-        Byte[] _temp = new byte[4];
-        _temp[0] = val1;
-        _temp[1] = val2;
-        _temp[2] = val3;
-        _temp[3] = val4;
-        ans = BitConverter.ToSingle(_temp, 0);
-        return ans;
-    }
-
 }

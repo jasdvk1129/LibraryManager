@@ -165,11 +165,26 @@ namespace MathLibrary
         /// <summary>
         /// 2進制轉10進制
         /// </summary>
-        /// <param name="str2"></param>
+        /// <param name="str2">字串</param>
         /// <returns></returns>
         public int work2to10(string str2)
         {
             int ans = Convert.ToInt32(str2, 2);
+            return ans;
+        }
+        /// <summary>
+        /// 2進制轉10進制
+        /// </summary>
+        /// <param name="state">狀態陣列</param>
+        /// <returns></returns>
+        public int work2to10(byte[] state)
+        {
+            string str = "";
+            foreach (var item in state)
+            {
+                str += item;
+            }
+            int ans = Convert.ToInt32(str, 2);
             return ans;
         }
         /// <summary>
@@ -428,15 +443,15 @@ namespace MathLibrary
             return bin;
         }
         /// <summary>
-        /// 10進制字串轉2進制
+        /// ushort 10進制轉2進制
         /// </summary>
-        /// <param name="_val"></param>
+        /// <param name="DataH"></param>
+        /// <param name="DataL"></param>
         /// <returns></returns>
-        public string work10to2(string _val)
+        public string work10to2(ushort data)
         {
-            string bin = "00000000";
-            byte ans = Convert.ToByte(_val, 16);
-            bin = ("00000000" + Convert.ToString(ans, 2)).Right(8);
+            string bin = "0000000000000000";
+            bin = ("0000000000000000" + Convert.ToString(data, 2)).Right(16);
             return bin;
         }
         /// <summary>
