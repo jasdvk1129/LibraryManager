@@ -54,6 +54,18 @@ namespace MathLibrary
             return ans;
         }
         /// <summary>
+        /// 10進制浮點數IEEE754轉16進制
+        /// </summary>
+        /// <param name="Value">數值</param>
+        /// <returns></returns>
+        public ushort[] work754to16(float Value)
+        {
+            ushort[] uintData = new ushort[2];
+            float[] value = new float[1] { Value };
+            Buffer.BlockCopy(value, 0, uintData, 0, 4);
+            return uintData;
+        }
+        /// <summary>
         /// 16進制轉IEEE754
         /// </summary>
         /// <param name="dataHH"></param>

@@ -1,5 +1,8 @@
 ﻿namespace MathLibrary
 {
+    /// <summary>
+    /// 設備轉換函式
+    /// </summary>
     public class DeviceMathClass
     {
         public double WattMagnification_MWH10(int _no)
