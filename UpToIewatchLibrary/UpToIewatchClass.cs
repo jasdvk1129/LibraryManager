@@ -22,10 +22,6 @@ namespace UpToIewatchLibrary
         /// <param name="UdpPort">Udp通訊埠</param>
         public UpToIewatchClass(int UdpPort = 4660)
         {
-            Log.Logger = new LoggerConfiguration()
-                        .WriteTo.Console()
-                        .WriteTo.File("log/x200logs/log-.txt", outputTemplate: "{Timestamp:HH:mm:ss} [{Level:u3}] {Message}{NewLine}{Exception}")
-                        .CreateLogger();
             myUdpClient = new UdpClient(UdpPort);
         }
         private CRC16 crc16 = new CRC16();
@@ -194,7 +190,9 @@ namespace UpToIewatchLibrary
                 Thread.Sleep(500);
             }
             catch (Exception ex)
-            { Console.WriteLine(ex); }
+            {
+                Log.Error(ex, $"資料傳送異常，資料時間為{datetime}，現在時間為{DateTime.Now}");
+            }
         }
         #endregion
         /// <summary>
