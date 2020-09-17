@@ -25,6 +25,19 @@ namespace MathLibrary
             return retVal;
         }
         /// <summary>
+        /// 10進制轉整數
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private ushort[] work10to16(uint data)
+        {
+            ushort[] ans = new ushort[2];
+            byte[] databyte = BitConverter.GetBytes(data);
+            ans[0] = Convert.ToUInt16(databyte[1] * 256 + databyte[0]);
+            ans[1] = Convert.ToUInt16(databyte[3] * 256 + databyte[2]);
+            return ans;
+        }
+        /// <summary>
         /// 16進制字串轉IEEE754
         /// </summary>
         /// <param name="_val"></param>
