@@ -29,7 +29,7 @@ namespace MathLibrary
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        private ushort[] work10to16(uint data)
+        public ushort[] work10to16(uint data)
         {
             ushort[] ans = new ushort[2];
             byte[] databyte = BitConverter.GetBytes(data);
