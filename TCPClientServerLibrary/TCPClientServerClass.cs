@@ -1,17 +1,11 @@
 ﻿using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
 using Serilog;
-using Serilog.Formatting.Compact;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using static NetworkCommsDotNet.Tools.StreamTools;
-using ErrorMessageLibrary;
 
 
 
@@ -24,10 +18,15 @@ namespace TCPClientServerLibrary
         /// </summary>
         public string ErrorStr { get; set; }
 
-        /// <summary>
-        /// Bug儲存入徑
-        /// </summary>
-        private string WorkPath = AppDomain.CurrentDomain.BaseDirectory;
+        public TCPClientServerClass()
+        {
+            Log.Logger = new LoggerConfiguration()
+                           .WriteTo.Console()
+                           .WriteTo.File($"{AppDomain.CurrentDomain.BaseDirectory}\\log\\TCPClient\\TCPClientlog-.txt",
+                                         rollingInterval: RollingInterval.Day,
+                                         outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                           .CreateLogger();        //宣告Serilog初始化
+        }
 
         #region TCPClient
         /// <summary>
@@ -39,14 +38,14 @@ namespace TCPClientServerLibrary
         /// <param name="Message">訊息內容</param>
         public void MessageFunction(string Token, string IPaddress, int Port, string Message)
         {
-            var logPath = new LoggerConfiguration().WriteTo.File(new CompactJsonFormatter(), $"{WorkPath}//db_log//log.json", rollingInterval: RollingInterval.Hour).WriteTo.Console().CreateLogger();
             try
             {
                 NetworkComms.SendObject(Token, IPaddress, Port, Message);
             }
-            catch (ArgumentException ex) { logPath.Error("網路通訊異常請檢查", ex); ErrorStr = "網路通訊異常請檢查"; }
-            catch (ConnectionSetupException ex) { logPath.Error("網路通訊異常請檢查", ex); ErrorStr="網路通訊異常請檢查"; }
-            catch (ConnectionSendTimeoutException ex) { logPath.Error("接收端程式異常", ex); ErrorStr="接收端程式異常"; }
+            catch (ArgumentException ex) { Log.Error("網路通訊異常請檢查", ex); ErrorStr = "網路通訊異常請檢查"; }
+            catch (ConnectionSetupException ex) { Log.Error("網路通訊異常請檢查", ex); ErrorStr = "網路通訊異常請檢查"; }
+            catch (ConnectionSendTimeoutException ex) { Log.Error("接收端程式異常", ex); ErrorStr = "接收端程式異常"; }
+            catch (Exception ex) { Log.Error(ex, "傳送訊息錯誤"); }
         }
         /// <summary>
         /// 傳送檔案
@@ -57,7 +56,6 @@ namespace TCPClientServerLibrary
         /// <param name="FilePath">檔案路徑</param>
         public void FileFunction(string Token, string IPaddress, int Port, string FilePath)
         {
-            var logPath = new LoggerConfiguration().WriteTo.File(new CompactJsonFormatter(), $"{WorkPath}//db_log//log.json", rollingInterval: RollingInterval.Hour).WriteTo.Console().CreateLogger();
             try
             {
                 FileStream fileStream = new FileStream(FilePath, FileMode.Open, FileAccess.Read);
@@ -77,16 +75,17 @@ namespace TCPClientServerLibrary
                             NetworkComms.SendObject(Token, IPaddress, Port, sendWrapper);
                             fileStream.Close();
                         }
-                        catch (ArgumentException ex) { logPath.Error("網路通訊異常請檢查", ex); ErrorStr = "網路通訊異常請檢查"; }
-                        catch (ConnectionSetupException ex) { logPath.Error("網路通訊異常請檢查", ex); ErrorStr = "網路通訊異常請檢查"; }
-                        catch (ConnectionSendTimeoutException ex) { logPath.Error("接收端程式異常", ex); ErrorStr = "接收端程式異常"; }
+                        catch (ArgumentException ex) { Log.Error("網路通訊異常請檢查", ex); ErrorStr = "網路通訊異常請檢查"; }
+                        catch (ConnectionSetupException ex) { Log.Error("網路通訊異常請檢查", ex); ErrorStr = "網路通訊異常請檢查"; }
+                        catch (ConnectionSendTimeoutException ex) { Log.Error("接收端程式異常", ex); ErrorStr = "接收端程式異常"; }
+                        catch(Exception ex) { Log.Error(ex,"傳送檔案失敗"); }
                     }
                     break;
                 }
             }
-            catch (FileNotFoundException ex) { logPath.Error("搜尋不到或未有檔案產生", ex); ErrorStr = "搜尋不到或未有檔案產生"; }
-            catch (ObjectDisposedException ex) { logPath.Error("檔案刪除後未有檔案產生", ex); ErrorStr = "檔案刪除後未有檔案產生"; }
-            catch (DirectoryNotFoundException ex) { logPath.Error("找不到檔案路徑", ex); ErrorStr = "找不到檔案路徑"; }
+            catch (FileNotFoundException ex) { Log.Error("搜尋不到或未有檔案產生", ex); ErrorStr = "搜尋不到或未有檔案產生"; }
+            catch (ObjectDisposedException ex) { Log.Error("檔案刪除後未有檔案產生", ex); ErrorStr = "檔案刪除後未有檔案產生"; }
+            catch (DirectoryNotFoundException ex) { Log.Error("找不到檔案路徑", ex); ErrorStr = "找不到檔案路徑"; }
         }
         #endregion
 
