@@ -35,7 +35,7 @@ namespace LineNotifyLibrary
                                      $"------Line\r\nContent-Disposition: form-data; name=\"message\"\r\n\r\n{Message}\r\n" +
                                      "------Line--", ParameterType.RequestBody);
                 IRestResponse response = client.Execute(request);
-                Log.Information($"{response.ToString()}");
+                Console.WriteLine($"{response.Content}");
             }
             catch (Exception ex)
             {
@@ -63,7 +63,7 @@ namespace LineNotifyLibrary
                                      $"------Line\r\nContent-Disposition: form-data; name=\"imageFullsize\"\r\n\r\n{ImageUrl}\r\n" +
                                      "------Line--", ParameterType.RequestBody);
                 IRestResponse response = client.Execute(request);
-                Log.Information($"{response.ToString()}");
+                Console.WriteLine($"{response.Content}");
             }
             catch (Exception ex)
             {

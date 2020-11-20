@@ -1,7 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using Serilog;
+using System;
 using System.ServiceProcess;
-using System.Text;
 
 namespace SQLSwitchLibrary
 {
@@ -14,10 +13,15 @@ namespace SQLSwitchLibrary
     /// </summary>
     public class SQLswitchClass
     {
-        /// <summary>
-        /// 錯誤檔存入路徑
-        /// </summary>
-        public string WorkPath { get; set; }
+        public SQLswitchClass()
+        {
+            Log.Logger = new LoggerConfiguration()
+                             .WriteTo.Console()
+                             .WriteTo.File($"{AppDomain.CurrentDomain.BaseDirectory}\\log\\SQL\\sqllog-.txt",
+                                           rollingInterval: RollingInterval.Day,
+                                           outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
+                             .CreateLogger();        //宣告Serilog初始化
+        }
         /// <summary>
         /// 重啟SQLserver服務
         /// </summary>
@@ -33,9 +37,9 @@ namespace SQLSwitchLibrary
                 controller.Start();
                 controller.WaitForStatus(ServiceControllerStatus.Running);
             }
-            catch (ArgumentNullException ex) { _errorHide("服務名稱請勿輸入NULL", ex); }
-            catch (ArgumentException ex) { _errorHide("確認服務名稱是否正確", ex); }
-            catch (InvalidOperationException ex) { _errorHide("使用者權限錯誤程式請以最高權限執行", ex); }
+            catch (ArgumentNullException ex) { Log.Error(ex,"服務名稱請勿輸入NULL"); }
+            catch (ArgumentException ex) { Log.Error(ex,"確認服務名稱是否正確"); }
+            catch (InvalidOperationException ex) { Log.Error(ex,"使用者權限錯誤程式請以最高權限執行"); }
         }
     }
 }
