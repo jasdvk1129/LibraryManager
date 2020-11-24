@@ -8,12 +8,6 @@ namespace LineNotifyLibrary
     {
         public LineNotifyClass()
         {
-            Log.Logger = new LoggerConfiguration()
-                         .WriteTo.Console()
-                         .WriteTo.File($"{AppDomain.CurrentDomain.BaseDirectory}\\log\\line\\linelog-.txt",
-                                       rollingInterval: RollingInterval.Day,
-                                       outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                         .CreateLogger();        //宣告Serilog初始化
 
         }
 
