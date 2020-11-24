@@ -21,13 +21,6 @@ namespace TelegramLibrary
         /// <param name="personalname">個人名稱 (不使用請輸入 null)</param>
         public TelegramBotClass(string Telegram_Http_API, string groupname = null, string personalname = null)
         {
-            Log.Logger = new LoggerConfiguration()
-                         .WriteTo.Console()
-                         .WriteTo.File($"{AppDomain.CurrentDomain.BaseDirectory}\\log\\Telegram\\Telegramlog-.txt",
-                                       rollingInterval: RollingInterval.Day,
-                                       outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                         .CreateLogger();        //宣告Serilog初始化
-
             if (Telegram_Http_API != null)
             {
                 Telegram_HTTP_API = Telegram_Http_API;
