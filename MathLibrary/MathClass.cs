@@ -98,18 +98,29 @@ namespace MathLibrary
             return ans;
         }
         /// <summary>
-        /// 16進制轉10進制長整數(使用ushort)
+        /// 16進制轉32位元10進制
         /// </summary>
         /// <param name="HighData"></param>
         /// <param name="LowData"></param>
-        /// <param name="negative"></param>
         /// <returns></returns>
-        public long work16to10(ushort HighData, ushort LowData, bool negative = false)
+        public uint work16to10(ushort HighData, ushort LowData)
         {
-            long ans = HighData * 65536 + LowData;
+            uint ans = Convert.ToUInt32(HighData * 65536 + LowData);
+            return ans;
+        }
+        /// <summary>
+        /// 16進制轉32位元10進制(帶正負號)
+        /// </summary>
+        /// <param name="HighData"></param>
+        /// <param name="LowData"></param>
+        /// <returns></returns>
+        public int work16to10(ushort HighData, ushort LowData, bool negative = true)
+        {
+            int ans = 0;
+            uint data = Convert.ToUInt32(HighData * 65536 + LowData);
             if (negative)
-                if (ans >= 2147483617)
-                    ans -= 42949636377;
+                if (data >= 2147483647)
+                    ans = Convert.ToInt32(data - 4294967295);
             return ans;
         }
         /// <summary>
@@ -119,13 +130,13 @@ namespace MathLibrary
         /// <param name="dataL">低位元</param>
         /// <param name="negative">是否為負數</param>
         /// <returns></returns>
-        public int work16to10(byte dataH, byte dataL, bool negative = false)
+        public short work16to10(byte dataH, byte dataL, bool negative = false)
         {
-            int ans = 0;
-            ans = dataH * 256 + dataL;
+            short ans = 0;
+            ushort data = Convert.ToUInt16(dataH * 256 + dataL);
             if (negative)
-                if (ans >= 32768)
-                    ans -= 65536;
+                if (data >= 32767)
+                    ans = Convert.ToInt16(data - 65535);
             return ans;
         }
         /// <summary>
