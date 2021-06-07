@@ -122,7 +122,7 @@ namespace TelegramLibrary
         {
             try
             {
-                var client = new RestClient($"https://api.telegram.org/bot{Telegram_HTTP_API}/sendMessage?");
+                var client = new RestClient("https://api.telegram.org/bot"+Telegram_HTTP_API+"/sendMessage?");
                 client.Timeout = -1;
                 var request = new RestRequest(Method.POST);
                 request.AlwaysMultipartFormData = true;
@@ -176,7 +176,7 @@ namespace TelegramLibrary
         {
             try
             {
-                var client = new RestClient("https://api.telegram.org/bot{Telegram_HTTP_API}/sendDocument?");
+                var client = new RestClient("https://api.telegram.org/bot" + Telegram_HTTP_API + "/sendDocument?");
                 client.Timeout = -1;
                 var request = new RestRequest(Method.POST);
                 request.AddParameter("chat_id", Chat_ID);
@@ -233,7 +233,7 @@ namespace TelegramLibrary
         {
             try
             {
-                var client = new RestClient("https://api.telegram.org/bot{Telegram_HTTP_API}/sendPhoto?");
+                var client = new RestClient("https://api.telegram.org/bot" + Telegram_HTTP_API + "/sendPhoto?");
                 client.Timeout = -1;
                 var request = new RestRequest(Method.POST);
                 request.AddParameter("chat_id", Chat_ID);
@@ -290,7 +290,7 @@ namespace TelegramLibrary
         {
             try
             {
-                var client = new RestClient("https://api.telegram.org/bot{Telegram_HTTP_API}/sendVideo?");
+                var client = new RestClient("https://api.telegram.org/bot" + Telegram_HTTP_API + "/sendVideo?");
                 client.Timeout = -1;
                 var request = new RestRequest(Method.POST);
                 request.AddParameter("chat_id", Chat_ID);
@@ -347,7 +347,7 @@ namespace TelegramLibrary
         {
             try
             {
-                var client = new RestClient("https://api.telegram.org/bot{Telegram_HTTP_API}/sendVideo?");
+                var client = new RestClient("https://api.telegram.org/bot" + Telegram_HTTP_API + "/sendVideo?");
                 client.Timeout = -1;
                 var request = new RestRequest(Method.POST);
                 request.AddParameter("chat_id", Chat_ID);
