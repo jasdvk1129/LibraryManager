@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeControl_MSSql_Library",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeControl_MYSql_Library", "TimeControl_MYSql_Library\TimeControl_MYSql_Library.csproj", "{C01834C8-F1B7-4677-A6D2-E516948082C3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSLibrary", "SMSLibrary\SMSLibrary.csproj", "{59655CB0-F208-43BC-A117-60F207DEBE16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,10 @@ Global
 		{C01834C8-F1B7-4677-A6D2-E516948082C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C01834C8-F1B7-4677-A6D2-E516948082C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C01834C8-F1B7-4677-A6D2-E516948082C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59655CB0-F208-43BC-A117-60F207DEBE16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59655CB0-F208-43BC-A117-60F207DEBE16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59655CB0-F208-43BC-A117-60F207DEBE16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59655CB0-F208-43BC-A117-60F207DEBE16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
