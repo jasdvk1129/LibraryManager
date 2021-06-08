@@ -1,17 +1,17 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Win32.SafeHandles;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using TelegramLibrary.Modules;
 
 namespace TelegramLibrary
 {
-    public class TelegramBotClass
+    public class TelegramBotClass :IDisposable
     {
         /// <summary>
         /// Telegram初始化(所有上傳檔案都有容量限制，請依照Telegram官網為準)
@@ -86,32 +86,12 @@ namespace TelegramLibrary
 
         #region 傳送訊息
         /// <summary>
-        /// 傳送訊息-群組
+        /// 傳送訊息
         /// </summary>
         /// <param name="Message">訊息</param>
-        public void Send_Message_Group(string Message)
+        public void Send_Message(string Message)
         {
             Send_Message(Chat_ID, Message);
-            //try
-            //{
-            //    GetUpDate getUpDate = GetUpDates.Where(g => g.all_members_are_administrators == true & g.title == GroupName & g.type == "group").First();
-            //    Send_Message(Chat_ID, Message);
-            //}
-            //catch (Exception ex) { Log.Error(ex, "找不到群組名稱"); }
-        }
-        /// <summary>
-        /// 傳送訊息-個人
-        /// </summary>
-        /// <param name="Message">訊息</param>
-        public void Send_Message_Personal(string Message)
-        {
-            Send_Message(Chat_ID, Message);
-            //try
-            //{
-            //    GetUpDate getUpDate = GetUpDates.Where(g => g.first_name == PersonalName.Substring(0, 1) & g.last_name == PersonalName.Substring(1, 2) & g.type == "private").First();
-            //    Send_Message(Chat_ID, Message);
-            //}
-            //catch (Exception ex) { Log.Error(ex, "找不到個人姓名"); }
         }
         /// <summary>
         /// 傳送訊息方法
@@ -137,34 +117,13 @@ namespace TelegramLibrary
 
         #region 上傳檔案
         /// <summary>
-        /// 上傳檔案-群組
+        /// 上傳檔案
         /// </summary>
         /// <param name="Filed">檔案絕對路徑</param>
         /// <param name="Caption">描述 (不使用請輸入 null)</param>
-        public void Send_Filed_Group(string Filed, string Caption = null)
+        public void Send_Filed(string Filed, string Caption = null)
         {
             Send_Filed(Chat_ID, Filed, Caption);
-            //try
-            //{
-            //    GetUpDate getUpDate = GetUpDates.Where(g => g.all_members_are_administrators == true & g.title == GroupName & g.type == "group").First();
-            //    Send_Filed(Chat_ID, Filed, Caption);
-            //}
-            //catch (Exception ex) { Log.Error(ex, "找不到群組名稱"); }
-        }
-        /// <summary>
-        /// 上傳檔案-個人
-        /// </summary>
-        /// <param name="Filed">檔案絕對路徑</param>
-        /// <param name="Caption">描述 (不使用請輸入 null)</param>
-        public void Send_Filed_Personal(string Filed, string Caption = null)
-        {
-            Send_Filed(Chat_ID, Filed, Caption);
-            //try
-            //{
-            //    GetUpDate getUpDate = GetUpDates.Where(g => g.first_name == PersonalName.Substring(0, 1) & g.last_name == PersonalName.Substring(1, 2) & g.type == "private").First();
-            //    Send_Filed(Chat_ID, Filed, Caption);
-            //}
-            //catch (Exception ex) { Log.Error(ex, "找不到個人姓名"); }
         }
         /// <summary>
         /// 上傳檔案
@@ -194,34 +153,13 @@ namespace TelegramLibrary
 
         #region 上傳圖片
         /// <summary>
-        /// 上傳圖片-群組
+        /// 上傳圖片
         /// </summary>
         /// <param name="Filed">檔案絕對路徑</param>
         /// <param name="Caption">描述 (不使用請輸入 null)</param>
-        public void Send_Photo_Group(string Filed, string Caption = null)
+        public void Send_Photo(string Filed, string Caption)
         {
             Send_Photo(Chat_ID, Filed, Caption);
-            //try
-            //{
-            //    GetUpDate getUpDate = GetUpDates.Where(g => g.all_members_are_administrators == true & g.title == GroupName & g.type == "group").First();
-            //    Send_Photo(Chat_ID, Filed, Caption);
-            //}
-            //catch (Exception ex) { Log.Error(ex, "找不到群組名稱"); }
-        }
-        /// <summary>
-        /// 上傳圖片-個人
-        /// </summary>
-        /// <param name="Filed">檔案絕對路徑</param>
-        /// <param name="Caption">描述 (不使用請輸入 null)</param>
-        public void Send_Photo_Personal(string Filed, string Caption)
-        {
-            Send_Photo(Chat_ID, Filed, Caption);
-            //try
-            //{
-            //    GetUpDate getUpDate = GetUpDates.Where(g => g.all_members_are_administrators == true & g.title == GroupName & g.type == "group").First();
-            //    Send_Photo(Chat_ID, Filed, Caption);
-            //}
-            //catch (Exception ex) { Log.Error(ex, "找不到群組名稱"); }
         }
         /// <summary>
         /// 上傳圖片
@@ -251,34 +189,13 @@ namespace TelegramLibrary
 
         #region 上傳影片
         /// <summary>
-        /// 上傳影片(mp4)-群組
+        /// 上傳影片(mp4)
         /// </summary>
         /// <param name="Filed">檔案絕對路徑</param>
         /// <param name="Caption">描述 (不使用請輸入 null)</param>
-        public void Send_Video_Group(string Filed, string Caption = null)
+        public void Send_Video(string Filed, string Caption = null)
         {
             Send_Video(Chat_ID, Filed, Caption);
-            //try
-            //{
-            //    GetUpDate getUpDate = GetUpDates.Where(g => g.all_members_are_administrators == true & g.title == GroupName & g.type == "group").First();
-            //    Send_Video(Chat_ID, Filed, Caption);
-            //}
-            //catch (Exception ex) { Log.Error(ex, "找不到群組名稱"); }
-        }
-        /// <summary>
-        /// 上傳影片(mp4)-個人
-        /// </summary>
-        /// <param name="Filed">檔案絕對路徑</param>
-        /// <param name="Caption">描述 (不使用請輸入 null)</param>
-        public void Send_Video_Personal(string Filed, string Caption = null)
-        {
-            Send_Video(Chat_ID, Filed, Caption);
-            //try
-            //{
-            //    GetUpDate getUpDate = GetUpDates.Where(g => g.all_members_are_administrators == true & g.title == GroupName & g.type == "group").First();
-            //    Send_Video(Chat_ID, Filed, Caption);
-            //}
-            //catch (Exception ex) { Log.Error(ex, "找不到群組名稱"); }
         }
         /// <summary>
         /// 上傳影片
@@ -308,34 +225,13 @@ namespace TelegramLibrary
 
         #region 上傳動畫
         /// <summary>
-        /// 上傳動畫(GIF、有聲音video)-群組
+        /// 上傳動畫(GIF、有聲音video)
         /// </summary>
         /// <param name="Filed">檔案絕對路徑</param>
         /// <param name="Caption">描述 (不使用請輸入 null)</param>
-        public void Send_Animation_Group(string Filed, string Caption = null)
+        public void Send_Animation(string Filed, string Caption = null)
         {
             Send_Animation(Chat_ID, Filed, Caption);
-            //try
-            //{
-            //    GetUpDate getUpDate = GetUpDates.Where(g => g.all_members_are_administrators == true & g.title == GroupName & g.type == "group").First();
-            //    Send_Animation(Chat_ID, Filed, Caption);
-            //}
-            //catch (Exception ex) { Log.Error(ex, "找不到群組名稱"); }
-        }
-        /// <summary>
-        /// 上傳動畫(GIF、有聲音video)-個人
-        /// </summary>
-        /// <param name="Filed">檔案絕對路徑</param>
-        /// <param name="Caption">描述 (不使用請輸入 null)</param>
-        public void Send_Animation_Personal(string Filed, string Caption = null)
-        {
-            Send_Animation(Chat_ID, Filed, Caption);
-            //try
-            //{
-            //    GetUpDate getUpDate = GetUpDates.Where(g => g.all_members_are_administrators == true & g.title == GroupName & g.type == "group").First();
-            //    Send_Animation(Chat_ID, Filed, Caption);
-            //}
-            //catch (Exception ex) { Log.Error(ex, "找不到群組名稱"); }
         }
         /// <summary>
         /// 上傳動畫
@@ -360,6 +256,25 @@ namespace TelegramLibrary
                 Console.WriteLine(response.Content);
             }
             catch (Exception ex) { Log.Error(ex, $"傳送動畫失敗 傳送位址: {Telegram_HTTP_API} chat_id: {Chat_ID}"); }
+        }
+        #endregion
+
+        #region 釋放
+        private bool _disposed = false;
+        private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
+        public void Dispose() => Dispose(true);
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                _safeHandle?.Dispose();
+            }
+            _disposed = true;
         }
         #endregion
     }

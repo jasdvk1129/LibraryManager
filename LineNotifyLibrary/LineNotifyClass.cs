@@ -1,22 +1,33 @@
-﻿using RestSharp;
+﻿using Microsoft.Win32.SafeHandles;
+using RestSharp;
 using Serilog;
 using System;
+using System.Runtime.InteropServices;
 
 namespace LineNotifyLibrary
 {
-    public class LineNotifyClass
+    public class LineNotifyClass : IDisposable
     {
-        public LineNotifyClass()
-        {
+        /// <summary>
+        /// Line Notify權杖
+        /// </summary>
+        public string Token { get; set; }
 
+        /// <summary>
+        /// Line Notify初始物件
+        /// </summary>
+        /// <param name="token">Line Notify權杖</param>
+        public LineNotifyClass(string token)
+        {
+            Token = token;
         }
 
+        #region LINE傳送訊息
         /// <summary>
         /// LINE傳送訊息
         /// </summary>
-        /// <param name="Token">權杖</param>
         /// <param name="Message">訊息內容</param>
-        public void LineNotifyFunction(string Token, string Message)
+        public void LineNotifyFunction(string Message)
         {
             try
             {
@@ -36,13 +47,15 @@ namespace LineNotifyLibrary
                 Log.Error(ex, $"Line notify傳送發生錯誤 訊息內容:{Message}");
             }
         }
+        #endregion
+
+        #region LINE傳送訊息與圖片
         /// <summary>
         /// LINE傳送訊息與圖片
         /// </summary>
-        /// <param name="Token">權杖</param>
         /// <param name="Message">訊息內容</param>
         /// <param name="ImageUrl">網址圖片</param>
-        public void LineNotifyFunction(string Token, string Message, string ImageUrl)
+        public void LineNotifyFunction(string Message, string ImageUrl)
         {
             try
             {
@@ -64,5 +77,25 @@ namespace LineNotifyLibrary
                 Log.Error(ex, $"Line notify傳送發生錯誤 訊息內容:{Message} 圖片URL:{ImageUrl}");
             }
         }
+        #endregion
+
+        #region 釋放
+        private bool _disposed = false;
+        private SafeHandle _safeHandle = new SafeFileHandle(IntPtr.Zero, true);
+        public void Dispose() => Dispose(true);
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                _safeHandle?.Dispose();
+            }
+            _disposed = true;
+        }
+        #endregion
     }
 }
