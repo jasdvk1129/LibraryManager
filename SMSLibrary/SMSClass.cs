@@ -84,8 +84,8 @@ namespace SMSLibrary
                 {
                     byte[] cmd1 = Encoding.ASCII.GetBytes("AT+CSQ" + "\r");
                     byte[] cmd2 = Encoding.ASCII.GetBytes("AT+CMGF=0" + "\r");
-                    byte[] cmd3 = Encoding.ASCII.GetBytes("AT+CMGS=" + $"{_Message.Length * 2 + 14}" + "\r");
-                    byte[] cmd4 = new byte[30 + _Message.Length * 4 + 1];
+                    byte[] cmd3 = Encoding.ASCII.GetBytes("AT+CMGS=" + $"{Messageitem.Length * 2 + 14}" + "\r");
+                    byte[] cmd4 = new byte[30 + Messageitem.Length * 4 + 1];
                     string TitalStr = "0011000C91";
                     for (int i = 0; i < TitalStr.Length; i++)//長度10
                     {
@@ -101,13 +101,13 @@ namespace SMSLibrary
                     {
                         cmd4[i + 22] = Encoding.ASCII.GetBytes(MidStr.Substring(i, 1))[0];
                     }
-                    string EndStr = (_Message.Length * 2).ToString("X4");
+                    string EndStr = (Messageitem.Length * 2).ToString("X4");
                     for (int i = 0; i < EndStr.Length; i++)//長度4
                     {
                         cmd4[i + 26] = Encoding.ASCII.GetBytes(EndStr.Substring(i, 1))[0];
                     }
-                    char[] Messagedata = _Message.ToCharArray();
-                    for (int i = 0; i < _Message.Length; i++)
+                    char[] Messagedata = Messageitem.ToCharArray();
+                    for (int i = 0; i < Messageitem.Length; i++)
                     {
                         string Temp = Convert.ToInt32(Messagedata[i]).ToString("X4");
                         cmd4[29 + i * 4 + 1] = Encoding.ASCII.GetBytes(Temp.Substring(0, 1))[0];
@@ -115,7 +115,7 @@ namespace SMSLibrary
                         cmd4[29 + i * 4 + 3] = Encoding.ASCII.GetBytes(Temp.Substring(2, 1))[0];
                         cmd4[29 + i * 4 + 4] = Encoding.ASCII.GetBytes(Temp.Substring(3, 1))[0];
                     }
-                    cmd4[30 + _Message.Length * 4] = 26;
+                    cmd4[30 + Messageitem.Length * 4] = 26;
 
                     byte[] InByte0 = new byte[Rs232.BytesToRead];
                     int ReadCount0 = Rs232.Read(InByte0, 0, Rs232.BytesToRead);
