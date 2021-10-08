@@ -42,7 +42,7 @@ namespace UpToIewatchLibrary
         /// </param>
         /// <param name="serverip">上傳IP</param>
         /// <param name="serverport">上傳Port號</param>
-        public void scan_adioco(string tcardno, string tboardno, int[] AI, byte[] DI, byte[] DO,
+        public virtual void scan_adioco(string tcardno, string tboardno, int[] AI, byte[] DI, byte[] DO,
                                 float rv, float sv, float tv,
                                 float ra, float sa, float ta,
                                 float kw, float kwh, float pfe,
@@ -195,7 +195,7 @@ namespace UpToIewatchLibrary
             }
         }
         #endregion
-        public void scan_adioco(string tcardno, string tboardno, int[] AI, byte[] DI, byte[] DO,
+        public virtual void scan_adioco(string tcardno, string tboardno, int[] AI, byte[] DI, byte[] DO,
                                 float rv, float sv, float tv,
                                 float ra, float sa, float ta,
                                 float kw, float kwh, float pfe,
