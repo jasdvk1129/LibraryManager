@@ -15,7 +15,7 @@ namespace UpToIewatchLibrary
         /// <summary>
         /// UDP上傳指定 Port 4660
         /// </summary>
-        UdpClient myUdpClient = null;
+        protected UdpClient myUdpClient = null;
         /// <summary>
         /// 
         /// </summary>
@@ -24,7 +24,7 @@ namespace UpToIewatchLibrary
         {
             myUdpClient = new UdpClient(UdpPort);
         }
-        private CRC16 crc16 = new CRC16();
+        protected CRC16 crc16 { get; set; } = new CRC16();
         #region 上傳平台
         /// <summary>
         /// 上傳平台數值
@@ -353,7 +353,7 @@ namespace UpToIewatchLibrary
         /// </summary>
         /// <param name="state">狀態陣列</param>
         /// <returns></returns>
-        private byte work2to10(byte[] state)
+        public byte work2to10(byte[] state)
         {
             string str = "";
             foreach (var item in state)
@@ -365,7 +365,7 @@ namespace UpToIewatchLibrary
         }
     }
 }
-class CRC16
+public class CRC16
 {
     public void stringtobyte(String value1, int kind, out byte ou)
     {
