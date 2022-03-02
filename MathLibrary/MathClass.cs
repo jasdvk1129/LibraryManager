@@ -103,24 +103,9 @@ namespace MathLibrary
         /// <param name="HighData"></param>
         /// <param name="LowData"></param>
         /// <returns></returns>
-        public uint work16to10(ushort HighData, ushort LowData)
+        public int work16to10(ushort HighData, ushort LowData)
         {
-            uint ans = Convert.ToUInt32(HighData * 65536 + LowData);
-            return ans;
-        }
-        /// <summary>
-        /// 16進制轉32位元10進制(帶正負號)
-        /// </summary>
-        /// <param name="HighData"></param>
-        /// <param name="LowData"></param>
-        /// <returns></returns>
-        public int work16to10(ushort HighData, ushort LowData, bool negative = true)
-        {
-            int ans = 0;
-            uint data = Convert.ToUInt32(HighData * 65536 + LowData);
-            if (negative)
-                if (data >= 2147483647)
-                    ans = Convert.ToInt32(data - 4294967295);
+            int ans = Convert.ToInt32(HighData * 65536 + LowData);
             return ans;
         }
         /// <summary>
