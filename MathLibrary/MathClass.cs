@@ -131,7 +131,7 @@ namespace MathLibrary
         public int work16to10(byte dataHH, byte dataHL, byte dataLH, byte dataLL)
         {
             int ans = 0;
-            int H = dataHH * 256 + dataHL;
+            int H = dataHH * 65536 + dataHL;
             int L = dataLH * 256 + dataLL;
             ans = H * 256 + L;
             return ans;
