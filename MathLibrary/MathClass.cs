@@ -115,13 +115,9 @@ namespace MathLibrary
         /// <param name="dataL">低位元</param>
         /// <param name="negative">是否為負數</param>
         /// <returns></returns>
-        public short work16to10(byte dataH, byte dataL, bool negative = false)
+        public short work16to10(byte dataH, byte dataL)
         {
-            short ans = 0;
-            ushort data = Convert.ToUInt16(dataH * 256 + dataL);
-            if (negative)
-                if (data >= 32767)
-                    ans = Convert.ToInt16(data - 65535);
+            short ans = Convert.ToInt16(Convert.ToUInt16(dataH * 256 + dataL) > 32767 ? Convert.ToUInt16(dataH * 256 + dataL) - 65535 : Convert.ToUInt16(dataH * 256 + dataL));
             return ans;
         }
         /// <summary>
