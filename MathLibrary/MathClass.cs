@@ -128,12 +128,11 @@ namespace MathLibrary
         /// <param name="dataLH"></param>
         /// <param name="dataLL"></param>
         /// <returns></returns>
-        public int work16to10(byte dataHH, byte dataHL, byte dataLH, byte dataLL)
+        public uint work16to10(byte dataHH, byte dataHL, byte dataLH, byte dataLL)
         {
-            int ans = 0;
-            int H = dataHH * 65536 + dataHL;
-            int L = dataLH * 256 + dataLL;
-            ans = H * 256 + L;
+            uint H = Convert.ToUInt32(dataHH * 256 + dataHL);
+            uint L = Convert.ToUInt32(dataLH * 256 + dataLL);
+            uint ans = H * 65536 + L;
             return ans;
         }
         /// <summary>
