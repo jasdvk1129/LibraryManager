@@ -117,7 +117,7 @@ namespace MathLibrary
         /// <returns></returns>
         public short work16to10(byte dataH, byte dataL)
         {
-            short ans = Convert.ToInt16(Convert.ToUInt16(dataH * 256 + dataL) > 32767 ? Convert.ToUInt16(dataH * 256 + dataL) - 65535 : Convert.ToUInt16(dataH * 256 + dataL));
+            short ans = Convert.ToInt16(Convert.ToUInt16(dataH * 256 + dataL) > 32767 ? Convert.ToUInt16(dataH * 256 + dataL) - 65536 : Convert.ToUInt16(dataH * 256 + dataL));
             return ans;
         }
         /// <summary>
